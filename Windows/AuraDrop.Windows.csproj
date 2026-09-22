@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>Resources\appicon.ico</ApplicationIcon>
+    <AssemblyName>AuraDrop</AssemblyName>
+    <RootNamespace>AuraDrop.Windows</RootNamespace>
+    <Version>1.0.0</Version>
+    <Company>AuraDrop</Company>
+    <Product>AuraDrop File Transfer</Product>
+    <Description>Fast and secure cross-platform local file transfer for Windows and Android</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AuraDrop.Core\AuraDrop.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\**" />
+  </ItemGroup>
+
+</Project>

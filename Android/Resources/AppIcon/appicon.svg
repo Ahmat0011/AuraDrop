@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+    <defs>
+        <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#0F172A" />
+            <stop offset="50%" stop-color="#1E293B" />
+            <stop offset="100%" stop-color="#0284C7" />
+        </linearGradient>
+    </defs>
+    <rect width="512" height="512" rx="128" fill="url(#bgGrad)" />
+</svg>

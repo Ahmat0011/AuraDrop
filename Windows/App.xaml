@@ -1,0 +1,169 @@
+<Application x:Class="AuraDrop.Windows.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- LocalSend Mint & Dark Emerald Palette -->
+            <Color x:Key="ColorBgPrimary">#101A18</Color>
+            <Color x:Key="ColorBgSecondary">#0E1715</Color>
+            <Color x:Key="ColorBgCard">#192724</Color>
+            <Color x:Key="ColorBgCardHover">#233632</Color>
+            <Color x:Key="ColorBorder">#253935</Color>
+            <Color x:Key="ColorMint">#5CD6B0</Color>
+            <Color x:Key="ColorMintDark">#40B893</Color>
+            <Color x:Key="ColorPillActive">#263E37</Color>
+            <Color x:Key="ColorTextPrimary">#F0FDF8</Color>
+            <Color x:Key="ColorTextSecondary">#8CA39C</Color>
+            <Color x:Key="ColorTextMuted">#58736B</Color>
+
+            <SolidColorBrush x:Key="BgPrimary" Color="{StaticResource ColorBgPrimary}" />
+            <SolidColorBrush x:Key="BgSecondary" Color="{StaticResource ColorBgSecondary}" />
+            <SolidColorBrush x:Key="BgCard" Color="{StaticResource ColorBgCard}" />
+            <SolidColorBrush x:Key="BgCardHover" Color="{StaticResource ColorBgCardHover}" />
+            <SolidColorBrush x:Key="BorderColor" Color="{StaticResource ColorBorder}" />
+            <SolidColorBrush x:Key="AccentMint" Color="{StaticResource ColorMint}" />
+            <SolidColorBrush x:Key="AccentMintDark" Color="{StaticResource ColorMintDark}" />
+            <SolidColorBrush x:Key="PillActive" Color="{StaticResource ColorPillActive}" />
+            <SolidColorBrush x:Key="TextPrimary" Color="{StaticResource ColorTextPrimary}" />
+            <SolidColorBrush x:Key="TextSecondary" Color="{StaticResource ColorTextSecondary}" />
+            <SolidColorBrush x:Key="TextMuted" Color="{StaticResource ColorTextMuted}" />
+            <SolidColorBrush x:Key="AccentRed" Color="#F87171" />
+
+            <Style TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+                <Setter Property="FontFamily" Value="Segoe UI, -apple-system, sans-serif" />
+            </Style>
+
+            <!-- Pill Navigation RadioButton Style -->
+            <Style x:Key="NavPillButton" TargetType="RadioButton">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Foreground" Value="{StaticResource TextSecondary}" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="RadioButton">
+                            <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="20" Padding="16,10">
+                                <ContentPresenter VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter TargetName="border" Property="Background" Value="{StaticResource PillActive}" />
+                                    <Setter Property="Foreground" Value="{StaticResource AccentMint}" />
+                                </Trigger>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="IsMouseOver" Value="True" />
+                                        <Condition Property="IsChecked" Value="False" />
+                                    </MultiTrigger.Conditions>
+                                    <Setter TargetName="border" Property="Background" Value="#172421" />
+                                </MultiTrigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Action Card Button (Media, Text, File, Folder) -->
+            <Style x:Key="ActionCardButton" TargetType="Button">
+                <Setter Property="Background" Value="{StaticResource BgCard}" />
+                <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+                <Setter Property="BorderBrush" Value="{StaticResource BorderColor}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Padding" Value="16,14" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="12" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="bd" Property="Background" Value="{StaticResource BgCardHover}" />
+                                    <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource AccentMint}" />
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="bd" Property="Background" Value="#121D1A" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Mint Primary Button -->
+            <Style x:Key="MintButton" TargetType="Button">
+                <Setter Property="Background" Value="{StaticResource AccentMint}" />
+                <Setter Property="Foreground" Value="#091412" />
+                <Setter Property="FontWeight" Value="Bold" />
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="Padding" Value="16,8" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="20" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="border" Property="Opacity" Value="0.9" />
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="border" Property="Opacity" Value="0.75" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Subtle Secondary Button -->
+            <Style x:Key="SubtleButton" TargetType="Button">
+                <Setter Property="Background" Value="{StaticResource BgCard}" />
+                <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="Padding" Value="12,6" />
+                <Setter Property="BorderBrush" Value="{StaticResource BorderColor}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="border" Property="Background" Value="{StaticResource BgCardHover}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Modern Input Box -->
+            <Style x:Key="ModernTextBox" TargetType="TextBox">
+                <Setter Property="Background" Value="{StaticResource BgCard}" />
+                <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+                <Setter Property="BorderBrush" Value="{StaticResource BorderColor}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="Padding" Value="12,8" />
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="CaretBrush" Value="{StaticResource AccentMint}" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="TextBox">
+                            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8">
+                                <ScrollViewer x:Name="PART_ContentHost" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

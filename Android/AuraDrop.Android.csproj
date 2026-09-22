@@ -1,0 +1,76 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net10.0-android</TargetFrameworks>
+		<OutputType>Exe</OutputType>
+		<RootNamespace>AuraDrop.AndroidApp</RootNamespace>
+		<UseMaui>true</UseMaui>
+		<SingleProject>true</SingleProject>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+
+		<!-- Display name -->
+		<ApplicationTitle>AuraDrop</ApplicationTitle>
+
+		<!-- App Identifier -->
+		<ApplicationId>com.auradrop.transfer</ApplicationId>
+
+		<!-- Versions -->
+		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+		<ApplicationVersion>1</ApplicationVersion>
+
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
+
+		<!-- Android Optimizations -->
+		<AndroidUseAapt2>true</AndroidUseAapt2>
+		<AndroidDexTool>d8</AndroidDexTool>
+		<AndroidEnableSGenConc>true</AndroidEnableSGenConc>
+
+		<!-- Interpreter Mode for reliable debug compatibility -->
+		<AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+		<AndroidEnableLLVM>false</AndroidEnableLLVM>
+		<AndroidUseFullAot>false</AndroidUseFullAot>
+		<AndroidUseInterpreter Condition="'$(Configuration)' == 'Debug'">true</AndroidUseInterpreter>
+		<AndroidAotAssemblies></AndroidAotAssemblies>
+		<AndroidAotAdditionalArgs>--skip-sources</AndroidAotAdditionalArgs>
+
+		<NoWarn>$(NoWarn);NU1605;CS8622;CS8625;CS8602;CS8601;CS8600;MVVMTK0045;MVVMTK0051;CS0618</NoWarn>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+		<AndroidPackageFormat>apk</AndroidPackageFormat>
+		<AndroidKeyStore>true</AndroidKeyStore>
+		<AndroidSigningKeyStore>release.keystore</AndroidSigningKeyStore>
+		<AndroidSigningKeyAlias>omnicast</AndroidSigningKeyAlias>
+		<AndroidSigningStorePass>OmniCast2026!</AndroidSigningStorePass>
+		<AndroidSigningKeyPass>OmniCast2026!</AndroidSigningKeyPass>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- App Icon -->
+		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appicon_fg.svg" Color="#0B0F19" />
+
+		<!-- Splash Screen -->
+		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#0B0F19" BaseSize="160,160" />
+
+		<!-- Images -->
+		<MauiImage Include="Resources\Images\*" />
+
+		<!-- Custom Fonts -->
+		<MauiFont Include="Resources\Fonts\*" />
+
+		<!-- Raw Assets -->
+		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\AuraDrop.Core\AuraDrop.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.41" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+	</ItemGroup>
+
+</Project>

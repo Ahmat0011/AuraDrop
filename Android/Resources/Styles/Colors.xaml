@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xaml-comp compile="true" ?>
+<ResourceDictionary 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- LocalSend Mint & Dark Emerald Palette -->
+    <Color x:Key="Primary">#5CD6B0</Color>
+    <Color x:Key="PrimaryDark">#40B893</Color>
+    <Color x:Key="PrimaryLight">#7FEAC7</Color>
+    <Color x:Key="Secondary">#263E37</Color>
+    <Color x:Key="Accent">#5CD6B0</Color>
+    <Color x:Key="Success">#5CD6B0</Color>
+    <Color x:Key="Warning">#F59E0B</Color>
+    <Color x:Key="Danger">#F87171</Color>
+
+    <!-- Backgrounds & Surfaces (LocalSend OLED Emerald Dark Mode) -->
+    <Color x:Key="BackgroundDark">#101A18</Color>
+    <Color x:Key="SurfaceDark">#14211E</Color>
+    <Color x:Key="SurfaceLightDark">#1A2825</Color>
+    <Color x:Key="CardBackground">#1A2825</Color>
+    <Color x:Key="CardBorder">#253935</Color>
+
+    <!-- Text Colors -->
+    <Color x:Key="TextPrimary">#F0FDF8</Color>
+    <Color x:Key="TextSecondary">#8CA39C</Color>
+    <Color x:Key="TextMuted">#58736B</Color>
+    <Color x:Key="White">#FFFFFF</Color>
+
+    <!-- Brushes -->
+    <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary}" />
+    <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceDark}" />
+    <SolidColorBrush x:Key="CardBrush" Color="{StaticResource CardBackground}" />
+    <SolidColorBrush x:Key="CardBorderBrush" Color="{StaticResource CardBorder}" />
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimary}" />
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondary}" />
+
+    <LinearGradientBrush x:Key="BrandGradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#5CD6B0" Offset="0.0" />
+        <GradientStop Color="#40B893" Offset="1.0" />
+    </LinearGradientBrush>
+</ResourceDictionary>

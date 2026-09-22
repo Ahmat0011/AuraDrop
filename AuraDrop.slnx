@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/Android/">
+    <Project Path="Android/AuraDrop.Android.csproj" />
+  </Folder>
+  <Folder Name="/Windows/">
+    <Project Path="Windows/AuraDrop.Windows.csproj" />
+  </Folder>
+  <Project Path="AuraDrop.Core/AuraDrop.Core.csproj" />
+</Solution>
