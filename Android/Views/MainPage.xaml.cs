@@ -1,4 +1,6 @@
 using System.Collections.ObjectModel;
+using AuraDrop.AndroidApp.Models;
+using AuraDrop.AndroidApp.Services;
 using AuraDrop.Core.Models;
 using AuraDrop.Core.PinCode;
 using AuraDrop.Core.Services;
@@ -13,6 +15,10 @@ public partial class MainPage : ContentPage
     private readonly ObservableCollection<TransferFile> _selectedFiles = new();
     private readonly ObservableCollection<CoreDeviceInfo> _nearbyDevices = new();
     private readonly ObservableCollection<TransferHistoryItem> _historyItems = new();
+    private List<MediaGalleryItem> _allMediaItems = new();
+    private List<MediaGalleryItem> _currentMediaItems = new();
+    private List<MediaCategory> _categories = new();
+    private string _selectedCategoryKey = "all";
     private CancellationTokenSource? _activeTransferCts;
 
     public MainPage()
@@ -213,20 +219,7 @@ public partial class MainPage : ContentPage
 
     private async void OnPickPhotosClicked(object? sender, EventArgs e)
     {
-        try
-        {
-            var results = await FilePicker.Default.PickMultipleAsync(new PickOptions
-            {
-                PickerTitle = "Fotos & Videos in Originalqualität auswählen",
-                FileTypes = FilePickerFileType.Images
-            });
-
-            if (results != null) await AddPickedFilesAsync(results);
-        }
-        catch (Exception ex)
-        {
-            await DisplayAlert("Fehler", $"Foto-Auswahl fehlgeschlagen: {ex.Message}", "OK");
-        }
+        await OpenMediaPickerAsync();
     }
 
     private async void OnPickFilesClicked(object? sender, EventArgs e)
@@ -564,6 +557,223 @@ public partial class MainPage : ContentPage
     }
 
     #endregion
+
+    #region Native Media Gallery Picker
+
+    private async Task OpenMediaPickerAsync()
+    {
+        try
+        {
+            ViewMediaPicker.IsVisible = true;
+            BorderCategoryDropdown.IsVisible = false;
+            LayoutMediaLoading.IsVisible = true;
+            LayoutMediaEmpty.IsVisible = false;
+
+            var granted = await AndroidMediaService.Instance.RequestPermissionsAsync();
+            if (!granted)
+            {
+                await DisplayAlert("Berechtigung erforderlich", "Bitte erlaube Zugriff auf Fotos und Videos, um Medien auszuwählen.", "OK");
+            }
+
+            var (items, categories) = await AndroidMediaService.Instance.LoadAllMediaAsync();
+            _allMediaItems = items;
+            _categories = categories;
+
+            // Mark items already in transfer queue as selected
+            foreach (var item in _allMediaItems)
+            {
+                item.IsSelected = _selectedFiles.Any(f => f.LocalPath == item.FilePath || f.FileName == item.DisplayName);
+            }
+
+            _selectedCategoryKey = "all";
+            LblCurrentCategoryTitle.Text = "Alle Medien";
+
+            PopulateCategoryDropdown();
+            RefreshMediaGrid();
+
+            LayoutMediaLoading.IsVisible = false;
+            UpdateMediaPickerSelectionState();
+        }
+        catch (Exception ex)
+        {
+            LayoutMediaLoading.IsVisible = false;
+            await DisplayAlert("Fehler", $"Medien konnten nicht geladen werden: {ex.Message}", "OK");
+        }
+    }
+
+    private void PopulateCategoryDropdown()
+    {
+        StackCategories.Children.Clear();
+
+        foreach (var category in _categories)
+        {
+            var rowGrid = new Grid
+            {
+                ColumnDefinitions = new ColumnDefinitionCollection
+                {
+                    new ColumnDefinition(new GridLength(48)),
+                    new ColumnDefinition(GridLength.Star),
+                    new ColumnDefinition(new GridLength(32))
+                },
+                Padding = new Thickness(14, 8),
+                BackgroundColor = category.Key == _selectedCategoryKey 
+                    ? Color.FromArgb("#1E293B") 
+                    : Colors.Transparent
+            };
+
+            // Thumbnail Preview
+            var borderThumb = new Border
+            {
+                WidthRequest = 42,
+                HeightRequest = 42,
+                StrokeShape = new Microsoft.Maui.Controls.Shapes.RoundRectangle { CornerRadius = 6 },
+                Stroke = Colors.Transparent,
+                BackgroundColor = Color.FromArgb("#1E2C48")
+            };
+            if (category.CoverImage != null)
+            {
+                borderThumb.Content = new Image
+                {
+                    Source = category.CoverImage,
+                    Aspect = Aspect.AspectFill,
+                    WidthRequest = 42,
+                    HeightRequest = 42
+                };
+            }
+            rowGrid.Children.Add(borderThumb);
+            Grid.SetColumn(borderThumb, 0);
+
+            // Title & Count (e.g. "Screenshots (21)")
+            var lblTitle = new Label
+            {
+                Text = category.DisplayTitle,
+                FontSize = 14,
+                FontAttributes = category.Key == _selectedCategoryKey ? FontAttributes.Bold : FontAttributes.None,
+                TextColor = category.Key == _selectedCategoryKey ? Color.FromArgb("#38BDF8") : Color.FromArgb("#F8FAFC"),
+                VerticalOptions = LayoutOptions.Center,
+                Margin = new Thickness(12, 0, 0, 0)
+            };
+            rowGrid.Children.Add(lblTitle);
+            Grid.SetColumn(lblTitle, 1);
+
+            // Active Category Checkmark
+            if (category.Key == _selectedCategoryKey)
+            {
+                var lblCheck = new Label
+                {
+                    Text = "✓",
+                    TextColor = Color.FromArgb("#10B981"),
+                    FontSize = 18,
+                    FontAttributes = FontAttributes.Bold,
+                    HorizontalOptions = LayoutOptions.Center,
+                    VerticalOptions = LayoutOptions.Center
+                };
+                rowGrid.Children.Add(lblCheck);
+                Grid.SetColumn(lblCheck, 2);
+            }
+
+            var tapGesture = new TapGestureRecognizer();
+            var catKey = category.Key;
+            var catTitle = category.Title;
+            tapGesture.Tapped += (s, e) =>
+            {
+                _selectedCategoryKey = catKey;
+                LblCurrentCategoryTitle.Text = catTitle;
+                BorderCategoryDropdown.IsVisible = false;
+                PathCategoryChevron.Rotation = 0;
+                PopulateCategoryDropdown();
+                RefreshMediaGrid();
+            };
+            rowGrid.GestureRecognizers.Add(tapGesture);
+
+            StackCategories.Children.Add(rowGrid);
+        }
+    }
+
+    private void RefreshMediaGrid()
+    {
+        _currentMediaItems = AndroidMediaService.Instance.FilterByCategory(_selectedCategoryKey);
+        CvMediaGrid.ItemsSource = null;
+        CvMediaGrid.ItemsSource = _currentMediaItems;
+        LayoutMediaEmpty.IsVisible = _currentMediaItems.Count == 0;
+    }
+
+    private void OnCloseMediaPickerClicked(object? sender, EventArgs e)
+    {
+        ViewMediaPicker.IsVisible = false;
+        BorderCategoryDropdown.IsVisible = false;
+        PathCategoryChevron.Rotation = 0;
+    }
+
+    private void OnToggleCategoryDropdownClicked(object? sender, EventArgs e)
+    {
+        BorderCategoryDropdown.IsVisible = !BorderCategoryDropdown.IsVisible;
+        PathCategoryChevron.Rotation = BorderCategoryDropdown.IsVisible ? 180 : 0;
+    }
+
+    private void OnMediaGridItemTapped(object? sender, EventArgs e)
+    {
+        if (sender is Element element && element.BindingContext is MediaGalleryItem item)
+        {
+            item.IsSelected = !item.IsSelected;
+            UpdateMediaPickerSelectionState();
+        }
+    }
+
+    private void OnClearMediaPickerSelectionClicked(object? sender, EventArgs e)
+    {
+        foreach (var item in _allMediaItems)
+        {
+            item.IsSelected = false;
+        }
+        UpdateMediaPickerSelectionState();
+    }
+
+    private void UpdateMediaPickerSelectionState()
+    {
+        int selectedCount = _allMediaItems.Count(m => m.IsSelected);
+        LblMediaSelectionSummary.Text = selectedCount == 1 ? "1 ausgewählt" : $"{selectedCount} ausgewählt";
+        BtnConfirmMediaSelection.Text = selectedCount > 0 ? $"Bestätigen ({selectedCount})" : "Bestätigen";
+        BtnConfirmMediaSelection.IsEnabled = selectedCount > 0;
+        BtnConfirmMediaSelection.Opacity = selectedCount > 0 ? 1.0 : 0.6;
+    }
+
+    private void OnConfirmMediaSelectionClicked(object? sender, EventArgs e)
+    {
+        var selectedMedia = _allMediaItems.Where(m => m.IsSelected).ToList();
+        foreach (var item in selectedMedia)
+        {
+            if (_selectedFiles.Any(f => f.LocalPath == item.FilePath || f.FileName == item.DisplayName))
+                continue;
+
+            _selectedFiles.Add(new TransferFile
+            {
+                FileName = item.DisplayName,
+                FileSize = item.FileSize,
+                ContentType = item.MimeType,
+                LocalPath = item.FilePath,
+#if ANDROID
+                OpenStreamAsync = () => Task.FromResult<Stream>(
+                    !string.IsNullOrEmpty(item.FilePath) && File.Exists(item.FilePath)
+                        ? File.OpenRead(item.FilePath)
+                        : Android.App.Application.Context.ContentResolver!.OpenInputStream(Android.Net.Uri.Parse(item.UriString)!)!
+                )
+#endif
+            });
+        }
+
+        ViewMediaPicker.IsVisible = false;
+        BorderCategoryDropdown.IsVisible = false;
+        PathCategoryChevron.Rotation = 0;
+        UpdateUiState();
+    }
+
+    private async void OnReloadMediaClicked(object? sender, EventArgs e)
+    {
+        await OpenMediaPickerAsync();
+    }
+
+    #endregion
 }
 
 public class RadarOrbDrawable : IDrawable
@@ -584,19 +794,37 @@ public class RadarOrbDrawable : IDrawable
         canvas.FillColor = cyanColor;
         canvas.FillCircle(cx, cy, 24);
 
-        // Draw 6 orbital arc segments
+        // Draw continuous solid outer glowing neon ring (no dashes, no gaps, completely filled!)
         canvas.StrokeColor = cyanColor;
-        canvas.StrokeSize = 8;
+        canvas.StrokeSize = 7;
         canvas.StrokeLineCap = LineCap.Round;
+        canvas.DrawCircle(cx, cy, 56);
 
-        float outerRadius = 56;
-        for (int i = 0; i < 6; i++)
-        {
-            float startAngle = i * 60 + 12;
-            float sweepAngle = 36;
-            var path = new PathF();
-            path.AddArc(cx - outerRadius, cy - outerRadius, cx + outerRadius, cy + outerRadius, startAngle, startAngle + sweepAngle, clockwise: true);
-            canvas.DrawPath(path);
-        }
+        // Draw inner subtle guide circle
+        canvas.StrokeColor = Color.FromArgb("#1E2C48");
+        canvas.StrokeSize = 2;
+        canvas.DrawCircle(cx, cy, 42);
+
+        // Draw crisp modern white download symbol in center
+        canvas.StrokeColor = Colors.White;
+        canvas.StrokeSize = 2.4f;
+        canvas.StrokeLineCap = LineCap.Round;
+        canvas.StrokeLineJoin = LineJoin.Round;
+
+        // Downward Arrow (vertical stem + chevron head)
+        canvas.DrawLine(cx, cy - 8, cx, cy + 3);
+        var arrowHead = new PathF();
+        arrowHead.MoveTo(cx - 5, cy - 1);
+        arrowHead.LineTo(cx, cy + 4);
+        arrowHead.LineTo(cx + 5, cy - 1);
+        canvas.DrawPath(arrowHead);
+
+        // Open Tray
+        var tray = new PathF();
+        tray.MoveTo(cx - 8, cy + 4);
+        tray.LineTo(cx - 8, cy + 8);
+        tray.LineTo(cx + 8, cy + 8);
+        tray.LineTo(cx + 8, cy + 4);
+        canvas.DrawPath(tray);
     }
 }

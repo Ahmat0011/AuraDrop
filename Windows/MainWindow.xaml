@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="AuraDrop"
+        Icon="Resources\appicon.ico"
         Height="730" Width="1080"
         MinHeight="640" MinWidth="920"
         WindowStartupLocation="CenterScreen"
@@ -40,7 +41,7 @@
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
                     <!-- Glowing Aura Icon -->
                     <Border Width="24" Height="24" CornerRadius="7" Background="{StaticResource AuraGradient}" Margin="0,0,10,0">
-                        <Path Data="{StaticResource GeoSend}" Stroke="#FFFFFF" StrokeThickness="1.5" Stretch="Uniform" Width="12" Height="12" Fill="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <Path Data="{StaticResource GeoDownload}" Stroke="#FFFFFF" StrokeThickness="1.5" Stretch="Uniform" Width="12" Height="12" Fill="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
                     <TextBlock Text="AuraDrop" FontSize="15" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center" />
                     <Border Background="#1E293B" CornerRadius="4" Padding="5,1" Margin="8,0,0,0" VerticalAlignment="Center">
@@ -157,24 +158,17 @@
                         <!-- High-Tech Neon Aura Centerpiece -->
                         <Viewbox Width="170" Height="170" HorizontalAlignment="Center" Margin="0,0,0,26">
                             <Canvas Width="170" Height="170">
-                                <!-- Outer Pulse Aura Ring 1 -->
-                                <Ellipse Canvas.Left="10" Canvas.Top="10" Width="150" Height="150" Stroke="#1E2E4A" StrokeThickness="1.5" StrokeDashArray="4 4" />
-                                <!-- Outer Pulse Aura Ring 2 -->
-                                <Ellipse Canvas.Left="26" Canvas.Top="26" Width="118" Height="118" Stroke="#2A3D63" StrokeThickness="2" />
+                                <!-- Continuous Glowing Neon Aura Ring -->
+                                <Ellipse Canvas.Left="15" Canvas.Top="15" Width="140" Height="140" Stroke="{StaticResource AuraGradient}" StrokeThickness="7" />
                                 
-                                <!-- Curved Orbital Segment Glows -->
-                                <Path Stroke="{StaticResource AccentCyan}" StrokeThickness="6" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                                      Data="M 40,32 A 60,60 0 0,1 130,32" />
-                                <Path Stroke="{StaticResource AccentIndigo}" StrokeThickness="6" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                                      Data="M 148,85 A 60,60 0 0,1 125,138" />
-                                <Path Stroke="{StaticResource AccentCyan}" StrokeThickness="6" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                                      Data="M 45,138 A 60,60 0 0,1 22,85" />
+                                <!-- Subtle Inner Guide Ring -->
+                                <Ellipse Canvas.Left="34" Canvas.Top="34" Width="102" Height="102" Stroke="#1E2E4A" StrokeThickness="2" />
 
                                 <!-- Glowing Core Circle -->
                                 <Ellipse Canvas.Left="55" Canvas.Top="55" Width="60" Height="60" Fill="{StaticResource AuraGradient}" />
                                 
                                 <!-- Core Icon -->
-                                <Path Canvas.Left="73" Canvas.Top="72" Data="{StaticResource GeoReceive}" Stroke="#FFFFFF" StrokeThickness="2.2" Stretch="Uniform" Width="24" Height="24" Fill="Transparent" />
+                                <Path Canvas.Left="73" Canvas.Top="72" Data="{StaticResource GeoDownload}" Stroke="#FFFFFF" StrokeThickness="2.2" Stretch="Uniform" Width="24" Height="24" Fill="Transparent" />
                             </Canvas>
                         </Viewbox>
 

@@ -21,8 +21,10 @@ if (-not $version) {
 
 Write-Host "`n[1/3] Kompiliere und signiere APK für Android (Version $version)..." -ForegroundColor Yellow
 
-# Vorherige APKs aufräumen
+# Vorherige APKs und Icon-Cache aufräumen
 Get-ChildItem -Path (Join-Path $projectDir "bin\Release") -Filter "*.apk" -Recurse -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
+Remove-Item -Path (Join-Path $projectDir "obj\Release\net10.0-android\resizetizer") -Recurse -Force -ErrorAction SilentlyContinue
+Remove-Item -Path (Join-Path $projectDir "obj\Debug\net10.0-android\resizetizer") -Recurse -Force -ErrorAction SilentlyContinue
 
 dotnet publish $csproj `
     -f net10.0-android `

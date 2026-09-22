@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
     <defs>
-        <linearGradient id="auraBeam" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#818CF8" />
-            <stop offset="50%" stop-color="#38BDF8" />
-            <stop offset="100%" stop-color="#06B6D4" />
+        <!-- Continuous Smooth Aura Ring Gradient (Cyan to Indigo) -->
+        <linearGradient id="auraRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#38BDF8" />
+            <stop offset="50%" stop-color="#6366F1" />
+            <stop offset="100%" stop-color="#38BDF8" />
         </linearGradient>
         <linearGradient id="coreGlow" x1="0%" y1="100%" x2="100%" y2="0%">
             <stop offset="0%" stop-color="#4F46E5" />
@@ -12,25 +13,18 @@
         </linearGradient>
     </defs>
 
-    <!-- Outer Orbital Segments (Radar Aura) -->
-    <!-- Top Arc -->
-    <path d="M 180 120 A 150 150 0 0 1 332 120" fill="none" stroke="url(#auraBeam)" stroke-width="22" stroke-linecap="round" />
-    <!-- Right Arc -->
-    <path d="M 390 190 A 150 150 0 0 1 405 310" fill="none" stroke="url(#auraBeam)" stroke-width="22" stroke-linecap="round" />
-    <!-- Bottom Right Arc -->
-    <path d="M 370 365 A 150 150 0 0 1 270 405" fill="none" stroke="url(#auraBeam)" stroke-width="22" stroke-linecap="round" />
-    <!-- Bottom Left Arc -->
-    <path d="M 210 400 A 150 150 0 0 1 125 345" fill="none" stroke="url(#auraBeam)" stroke-width="22" stroke-linecap="round" />
-    <!-- Left Arc -->
-    <path d="M 107 280 A 150 150 0 0 1 122 180" fill="none" stroke="url(#auraBeam)" stroke-width="22" stroke-linecap="round" />
+    <!-- Continuous Closed Glowing Aura Ring (No Dashes, No Grey Sections) -->
+    <circle cx="256" cy="256" r="156" fill="none" stroke="url(#auraRingGrad)" stroke-width="22" />
 
-    <!-- Inner Pulse Ring -->
-    <circle cx="256" cy="256" r="96" fill="none" stroke="#38BDF8" stroke-width="6" stroke-opacity="0.45" />
+    <!-- Subtle Inner Guide Circle -->
+    <circle cx="256" cy="256" r="115" fill="none" stroke="#1E2E4A" stroke-width="3" />
 
-    <!-- Center Glowing Aura Core -->
+    <!-- Center Glowing Aura Core Circle -->
     <circle cx="256" cy="256" r="68" fill="url(#coreGlow)" />
 
-    <!-- Center Sharp Dynamic Transfer Beacon -->
-    <polygon points="296,216 224,258 244,268 250,296 264,278 286,290" fill="#FFFFFF" />
-    <line x1="296" y1="216" x2="244" y2="268" stroke="#1E293B" stroke-width="3" stroke-linecap="round" />
+    <!-- Crisp Modern White Download Symbol -->
+    <!-- Downward Arrow (stem + chevron) -->
+    <path d="M 256,224 V 258 M 244,248 L 256,260 L 268,248" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+    <!-- Open Tray -->
+    <path d="M 234,260 V 272 A 6,6 0 0 0 240,278 H 272 A 6,6 0 0 0 278,272 V 260" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
 </svg>

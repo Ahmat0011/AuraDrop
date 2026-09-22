@@ -11,8 +11,8 @@
         <Border Grid.Row="0" BackgroundColor="{StaticResource SurfaceDark}" Stroke="{StaticResource CardBorder}" StrokeThickness="0,0,0,1" StrokeShape="RoundRectangle 0" Padding="16,10">
             <Grid ColumnDefinitions="*, Auto">
                 <HorizontalStackLayout Grid.Column="0" Spacing="8" VerticalOptions="Center">
-                    <Border WidthRequest="26" HeightRequest="26" StrokeShape="RoundRectangle 8" BackgroundColor="{StaticResource Accent}" Stroke="Transparent" VerticalOptions="Center">
-                        <Path Data="M 22,2 L 11,13 M 22,2 L 15,22 L 11,13 L 2,9 Z" Stroke="White" StrokeThickness="1.5" Aspect="Uniform" WidthRequest="13" HeightRequest="13" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Border WidthRequest="26" HeightRequest="26" StrokeShape="RoundRectangle 8" BackgroundColor="{StaticResource Primary}" Stroke="Transparent" VerticalOptions="Center">
+                        <Path Data="M 12,3 V 15 M 7,10 L 12,15 L 17,10 M 4,17 V 19 A 2,2 0 0 0 6,21 H 18 A 2,2 0 0 0 20,19 V 17" Stroke="#080C14" StrokeThickness="1.8" Aspect="Uniform" WidthRequest="13" HeightRequest="13" HorizontalOptions="Center" VerticalOptions="Center" />
                     </Border>
                     <Label Text="AuraDrop" FontSize="20" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" VerticalOptions="Center" />
                 </HorizontalStackLayout>
@@ -351,6 +351,140 @@
                         <Label x:Name="LblNavSettings" Text="Einstellungen" FontSize="11" FontAttributes="None" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" HorizontalTextAlignment="Center" LineBreakMode="NoWrap" />
                     </VerticalStackLayout>
                 </Grid>
+            </Grid>
+        </Grid>
+
+        <!-- ==================== NATIVE MEDIA GALLERY PICKER OVERLAY ==================== -->
+        <Grid x:Name="ViewMediaPicker" Grid.Row="0" Grid.RowSpan="3" BackgroundColor="{StaticResource SurfaceDark}" IsVisible="False" ZIndex="999">
+            <Grid.RowDefinitions>
+                <!-- Top Header (Close + Category Dropdown) -->
+                <RowDefinition Height="56" />
+                <!-- Media Grid -->
+                <RowDefinition Height="*" />
+                <!-- Bottom Confirmation Bar -->
+                <RowDefinition Height="64" />
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Grid Grid.Row="0" ColumnDefinitions="48, *, 48" BackgroundColor="{StaticResource SurfaceDark}" Padding="12,6">
+                <!-- Close Button 'X' -->
+                <Border Grid.Column="0" BackgroundColor="Transparent" Stroke="Transparent" WidthRequest="40" HeightRequest="40" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCloseMediaPickerClicked" />
+                    </Border.GestureRecognizers>
+                    <Path Data="M 18,6 L 6,18 M 6,6 L 18,18" Stroke="{StaticResource TextPrimary}" StrokeThickness="2" Aspect="Uniform" WidthRequest="18" HeightRequest="18" HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+
+                <!-- Category Pill Selector -->
+                <Border Grid.Column="1" BackgroundColor="{StaticResource CardBackground}" Stroke="{StaticResource CardBorder}" StrokeThickness="1" StrokeShape="RoundRectangle 18" Padding="14,6" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnToggleCategoryDropdownClicked" />
+                    </Border.GestureRecognizers>
+                    <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                        <Label x:Name="LblCurrentCategoryTitle" Text="Alle Medien" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" VerticalOptions="Center" />
+                        <Path x:Name="PathCategoryChevron" Data="M 6,9 L 12,15 L 18,9" Stroke="{StaticResource Primary}" StrokeThickness="2" Aspect="Uniform" WidthRequest="12" HeightRequest="12" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </Border>
+
+                <!-- Placeholder for balance -->
+                <Grid Grid.Column="2" />
+            </Grid>
+
+            <!-- Top Hairline Divider -->
+            <BoxView Grid.Row="0" HeightRequest="1" BackgroundColor="{StaticResource CardBorder}" VerticalOptions="End" />
+
+            <!-- Media Grid Container -->
+            <Grid Grid.Row="1">
+                <!-- Loading State -->
+                <VerticalStackLayout x:Name="LayoutMediaLoading" Spacing="12" VerticalOptions="Center" HorizontalOptions="Center" IsVisible="False">
+                    <ActivityIndicator IsRunning="True" Color="{StaticResource Primary}" WidthRequest="36" HeightRequest="36" />
+                    <Label Text="Medien werden geladen..." FontSize="13" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+
+                <!-- Empty State -->
+                <VerticalStackLayout x:Name="LayoutMediaEmpty" Spacing="10" VerticalOptions="Center" HorizontalOptions="Center" IsVisible="False">
+                    <Path Data="M 19,3 H 5 A 2,2 0 0 0 3,5 V 19 A 2,2 0 0 0 5,21 H 19 A 2,2 0 0 0 21,19 V 5 A 2,2 0 0 0 19,3 Z" Stroke="{StaticResource TextMuted}" StrokeThickness="1.5" Aspect="Uniform" WidthRequest="36" HeightRequest="36" HorizontalOptions="Center" />
+                    <Label Text="Keine Medien gefunden" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" HorizontalOptions="Center" />
+                    <Label Text="Stelle sicher, dass der Medienzugriff erlaubt ist." FontSize="12" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" />
+                    <Button Text="Medien neu laden" FontSize="12" FontAttributes="Bold" BackgroundColor="{StaticResource Secondary}" TextColor="{StaticResource Primary}" CornerRadius="10" Padding="16,8" Margin="0,6,0,0" Clicked="OnReloadMediaClicked" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+
+                <!-- 4-Column Media Grid (LocalSend Style) -->
+                <CollectionView x:Name="CvMediaGrid" SelectionMode="None">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" Span="4" HorizontalItemSpacing="2" VerticalItemSpacing="2" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid HeightRequest="90" WidthRequest="90" BackgroundColor="#0F172A">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnMediaGridItemTapped" />
+                                </Grid.GestureRecognizers>
+                                <!-- Thumbnail Image -->
+                                <Image Source="{Binding ThumbnailSource}" Aspect="AspectFill" HorizontalOptions="Fill" VerticalOptions="Fill" />
+
+                                <!-- Video Camera & Duration Badge (Bottom-Left) -->
+                                <Border IsVisible="{Binding IsVideo}" BackgroundColor="#CC080C14" Stroke="Transparent" StrokeShape="RoundRectangle 4" Padding="4,2" HorizontalOptions="Start" VerticalOptions="End" Margin="4">
+                                    <HorizontalStackLayout Spacing="3" VerticalOptions="Center">
+                                        <Path Data="M 15,10 L 20,7 V 17 L 15,14 V 17 A 2,2 0 0 1 13,19 H 3 A 2,2 0 0 1 1,17 V 7 A 2,2 0 0 1 3,5 H 13 A 2,2 0 0 1 15,7 Z" Stroke="White" StrokeThickness="1.2" Aspect="Uniform" WidthRequest="10" HeightRequest="10" VerticalOptions="Center" />
+                                        <Label Text="{Binding FormattedDuration}" FontSize="10" FontAttributes="Bold" TextColor="White" VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                </Border>
+
+                                <!-- Selection Circle (Top-Right) -->
+                                <Border Margin="4" WidthRequest="22" HeightRequest="22" HorizontalOptions="End" VerticalOptions="Start" StrokeThickness="1.5" StrokeShape="RoundRectangle 11">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="BackgroundColor" Value="#33000000" />
+                                            <Setter Property="Stroke" Value="#E2E8F0" />
+                                            <Style.Triggers>
+                                                <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                                                    <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+                                                    <Setter Property="Stroke" Value="{StaticResource Primary}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <Path Data="M 20,6 L 9,17 L 4,12" Stroke="White" StrokeThickness="2.2" Aspect="Uniform" WidthRequest="12" HeightRequest="12" HorizontalOptions="Center" VerticalOptions="Center">
+                                        <Path.Style>
+                                            <Style TargetType="Path">
+                                                <Setter Property="IsVisible" Value="False" />
+                                                <Style.Triggers>
+                                                    <DataTrigger TargetType="Path" Binding="{Binding IsSelected}" Value="True">
+                                                        <Setter Property="IsVisible" Value="True" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Path.Style>
+                                    </Path>
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <!-- Category Dropdown Sheet (Overlaid on top of grid) -->
+                <Border x:Name="BorderCategoryDropdown" BackgroundColor="{StaticResource SurfaceDark}" Stroke="{StaticResource CardBorder}" StrokeThickness="1" StrokeShape="RoundRectangle 0,0,16,16" VerticalOptions="Start" HorizontalOptions="Fill" Margin="16,0,16,0" IsVisible="False" ZIndex="1000" MaximumHeightRequest="420" Padding="0,6">
+                    <ScrollView VerticalScrollBarVisibility="Always">
+                        <VerticalStackLayout x:Name="StackCategories" Spacing="2">
+                            <!-- Dynamically generated category rows -->
+                        </VerticalStackLayout>
+                    </ScrollView>
+                </Border>
+            </Grid>
+
+            <!-- Bottom Action Bar -->
+            <Grid Grid.Row="2" ColumnDefinitions="Auto, *, Auto" BackgroundColor="{StaticResource SurfaceDark}" Padding="16,8" VerticalOptions="End">
+                <BoxView HeightRequest="1" BackgroundColor="{StaticResource CardBorder}" VerticalOptions="Start" Grid.ColumnSpan="3" />
+                
+                <!-- Clear Button -->
+                <Button Grid.Column="0" Text="Auswahl leeren" TextColor="{StaticResource TextMuted}" BackgroundColor="Transparent" FontSize="12" Clicked="OnClearMediaPickerSelectionClicked" VerticalOptions="Center" />
+
+                <!-- Selection Summary Text -->
+                <Label Grid.Column="1" x:Name="LblMediaSelectionSummary" Text="0 ausgewählt" FontSize="13" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" VerticalOptions="Center" />
+
+                <!-- Confirm Button -->
+                <Button Grid.Column="2" x:Name="BtnConfirmMediaSelection" Text="Bestätigen" BackgroundColor="{StaticResource Primary}" TextColor="#080C14" FontAttributes="Bold" CornerRadius="10" Padding="20,0" HeightRequest="44" Clicked="OnConfirmMediaSelectionClicked" VerticalOptions="Center" />
             </Grid>
         </Grid>
     </Grid>
