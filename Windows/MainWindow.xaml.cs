@@ -22,10 +22,10 @@ public partial class MainWindow : Window
 
     public MainWindow()
     {
-        InitializeComponent();
-
         var deviceName = Environment.MachineName;
         _manager = new AuraDropManager(deviceName, "Windows", 52525);
+
+        InitializeComponent();
 
         ListNearbyDevices.ItemsSource = _nearbyDevices;
         ListHistory.ItemsSource = _historyItems;
@@ -532,7 +532,8 @@ public partial class MainWindow : Window
 
     private void TxtSettingsPinCode_TextChanged(object sender, TextChangedEventArgs e)
     {
-        var text = TxtSettingsPinCode.Text.Trim();
+        if (_manager == null || TxtSettingsPinCode == null) return;
+        var text = TxtSettingsPinCode.Text?.Trim() ?? "";
         if (text.Length == 6 && int.TryParse(text, out _))
         {
             _manager.ConfiguredPin = text;

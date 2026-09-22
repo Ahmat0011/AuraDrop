@@ -495,6 +495,7 @@ public partial class MainPage : ContentPage
 
     private void OnPinConfigChanged(object? sender, TextChangedEventArgs e)
     {
+        if (_manager == null || EntryPinConfig == null) return;
         var text = EntryPinConfig.Text?.Trim() ?? "";
         if (text.Length == 6 && int.TryParse(text, out _))
         {
