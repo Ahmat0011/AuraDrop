@@ -1,13 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-    <!-- Smart TV Outline -->
-    <rect x="110" y="130" width="292" height="200" rx="20" fill="none" stroke="#38BDF8" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" />
-    <!-- TV Stand -->
-    <path d="M 210 330 L 190 380 L 322 380 L 302 330" fill="none" stroke="#38BDF8" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" />
-    
-    <!-- Cast Wi-Fi Waves emanating inside TV -->
-    <circle cx="170" cy="270" r="14" fill="#0284C7" />
-    <path d="M 170 230 A 40 40 0 0 1 210 270" fill="none" stroke="#0284C7" stroke-width="16" stroke-linecap="round" />
-    <path d="M 170 190 A 80 80 0 0 1 250 270" fill="none" stroke="#0284C7" stroke-width="16" stroke-linecap="round" />
-    <polygon points="310,180 350,205 310,230" fill="#0284C7" />
+    <defs>
+        <linearGradient id="auraBeam" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#818CF8" />
+            <stop offset="50%" stop-color="#38BDF8" />
+            <stop offset="100%" stop-color="#06B6D4" />
+        </linearGradient>
+        <linearGradient id="coreGlow" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#4F46E5" />
+            <stop offset="100%" stop-color="#38BDF8" />
+        </linearGradient>
+    </defs>
+
+    <!-- Outer Orbital Segments -->
+    <path d="M 180 120 A 150 150 0 0 1 332 120" fill="none" stroke="url(#auraBeam)" stroke-width="22" stroke-linecap="round" />
+    <path d="M 390 190 A 150 150 0 0 1 405 310" fill="none" stroke="url(#auraBeam)" stroke-width="22" stroke-linecap="round" />
+    <path d="M 370 365 A 150 150 0 0 1 270 405" fill="none" stroke="url(#auraBeam)" stroke-width="22" stroke-linecap="round" />
+    <path d="M 210 400 A 150 150 0 0 1 125 345" fill="none" stroke="url(#auraBeam)" stroke-width="22" stroke-linecap="round" />
+    <path d="M 107 280 A 150 150 0 0 1 122 180" fill="none" stroke="url(#auraBeam)" stroke-width="22" stroke-linecap="round" />
+
+    <!-- Inner Pulse Ring -->
+    <circle cx="256" cy="256" r="96" fill="none" stroke="#38BDF8" stroke-width="6" stroke-opacity="0.45" />
+
+    <!-- Center Glowing Aura Core -->
+    <circle cx="256" cy="256" r="68" fill="url(#coreGlow)" />
+
+    <!-- Center Sharp Dynamic Transfer Beacon -->
+    <polygon points="296,216 224,258 244,268 250,296 264,278 286,290" fill="#FFFFFF" />
+    <line x1="296" y1="216" x2="244" y2="268" stroke="#1E293B" stroke-width="3" stroke-linecap="round" />
 </svg>

@@ -8,25 +8,25 @@
     <Grid RowDefinitions="Auto, *, Auto">
 
         <!-- Top App Bar -->
-        <Border Grid.Row="0" BackgroundColor="{StaticResource SurfaceDark}" Stroke="{StaticResource CardBorder}" StrokeThickness="0,0,0,1" Padding="16,10">
+        <Border Grid.Row="0" BackgroundColor="{StaticResource SurfaceDark}" Stroke="{StaticResource CardBorder}" StrokeThickness="0,0,0,1" StrokeShape="RoundRectangle 0" Padding="16,10">
             <Grid ColumnDefinitions="*, Auto">
                 <HorizontalStackLayout Grid.Column="0" Spacing="8" VerticalOptions="Center">
-                    <Border WidthRequest="24" HeightRequest="24" StrokeShape="RoundRectangle 6" BackgroundColor="{StaticResource Accent}" VerticalOptions="Center">
-                        <Path Data="M 22,2 L 11,13 M 22,2 L 15,22 L 11,13 L 2,9 Z" Stroke="White" StrokeThickness="1.5" Aspect="Uniform" WidthRequest="12" HeightRequest="12" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Border WidthRequest="26" HeightRequest="26" StrokeShape="RoundRectangle 8" BackgroundColor="{StaticResource Accent}" Stroke="Transparent" VerticalOptions="Center">
+                        <Path Data="M 22,2 L 11,13 M 22,2 L 15,22 L 11,13 L 2,9 Z" Stroke="White" StrokeThickness="1.5" Aspect="Uniform" WidthRequest="13" HeightRequest="13" HorizontalOptions="Center" VerticalOptions="Center" />
                     </Border>
                     <Label Text="AuraDrop" FontSize="20" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" VerticalOptions="Center" />
                 </HorizontalStackLayout>
                 
-                <HorizontalStackLayout Grid.Column="1" Spacing="8" VerticalOptions="Center">
+                <HorizontalStackLayout Grid.Column="1" Spacing="6" VerticalOptions="Center">
                     <!-- History Button with Vector Path -->
-                    <Border BackgroundColor="Transparent" Padding="8,6" StrokeShape="RoundRectangle 8">
+                    <Border BackgroundColor="Transparent" Stroke="Transparent" Padding="8,6" StrokeShape="RoundRectangle 8">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnOpenHistoryClicked" />
                         </Border.GestureRecognizers>
                         <Path Data="M 12,8 V 12 L 15,15 M 12,22 A 10,10 0 1 0 12,2 A 10,10 0 0 0 12,22 Z" Stroke="{StaticResource TextSecondary}" StrokeThickness="1.8" Aspect="Uniform" WidthRequest="18" HeightRequest="18" />
                     </Border>
                     <!-- Info Button with Vector Path -->
-                    <Border BackgroundColor="Transparent" Padding="8,6" StrokeShape="RoundRectangle 8">
+                    <Border BackgroundColor="Transparent" Stroke="Transparent" Padding="8,6" StrokeShape="RoundRectangle 8">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnOpenInfoClicked" />
                         </Border.GestureRecognizers>
@@ -37,14 +37,14 @@
         </Border>
 
         <!-- Center Content Views -->
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" VerticalOptions="FillAndExpand">
 
             <!-- ==================== VIEW 1: RECEIVE ==================== -->
-            <ScrollView x:Name="ViewReceive" IsVisible="True" Padding="20">
-                <VerticalStackLayout Spacing="24" VerticalOptions="Center">
+            <ScrollView x:Name="ViewReceive" IsVisible="True" VerticalOptions="FillAndExpand" Padding="20,16">
+                <VerticalStackLayout Spacing="22" VerticalOptions="CenterAndExpand">
 
                     <!-- Center Segmented Emblem -->
-                    <Border WidthRequest="150" HeightRequest="150" BackgroundColor="Transparent" Stroke="Transparent" HorizontalOptions="Center">
+                    <Border WidthRequest="150" HeightRequest="150" BackgroundColor="Transparent" Stroke="Transparent" StrokeShape="RoundRectangle 0" HorizontalOptions="Center">
                         <GraphicsView x:Name="RadarCanvas" WidthRequest="150" HeightRequest="150" HorizontalOptions="Center" />
                     </Border>
 
@@ -55,34 +55,34 @@
                     </VerticalStackLayout>
 
                     <!-- Quick Save Switch -->
-                    <Border BackgroundColor="{StaticResource CardBackground}" Stroke="{StaticResource CardBorder}" StrokeThickness="1" StrokeShape="RoundRectangle 16" Padding="16,8" HorizontalOptions="Center">
+                    <Border BackgroundColor="{StaticResource CardBackground}" Stroke="{StaticResource CardBorder}" StrokeThickness="1" StrokeShape="RoundRectangle 20" Padding="16,8" HorizontalOptions="Center">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnToggleQuickSaveClicked" />
                         </Border.GestureRecognizers>
-                        <HorizontalStackLayout Spacing="8">
+                        <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
                             <Label Text="Quick Save:" FontSize="13" TextColor="{StaticResource TextSecondary}" VerticalOptions="Center" />
                             <Label x:Name="LblQuickSaveStatus" Text="An" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource Primary}" VerticalOptions="Center" />
                         </HorizontalStackLayout>
                     </Border>
 
                     <!-- Subtle PIN Fetch Action Button -->
-                    <Border BackgroundColor="{StaticResource CardBackground}" Stroke="{StaticResource CardBorder}" StrokeThickness="1" StrokeShape="RoundRectangle 12" Padding="14,10" HorizontalOptions="Center">
+                    <Border BackgroundColor="{StaticResource CardBackground}" Stroke="{StaticResource CardBorder}" StrokeThickness="1" StrokeShape="RoundRectangle 14" Padding="16,10" HorizontalOptions="Center">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnPromptFetchPinClicked" />
                         </Border.GestureRecognizers>
-                        <HorizontalStackLayout Spacing="8">
+                        <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
                             <Path Data="M 12,22 S 20,18 20,12 V 5 L 12,2 L 4,5 V 12 S 4,18 12,22 Z M 12,8 A 2,2 0 1 0 12,12 A 2,2 0 0 0 12,8 Z M 12,12 V 16" Stroke="{StaticResource Primary}" StrokeThickness="1.6" Aspect="Uniform" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
                             <Label Text="Per 6-stelligem PIN abholen..." FontSize="12" TextColor="{StaticResource TextSecondary}" VerticalOptions="Center" />
                         </HorizontalStackLayout>
                     </Border>
 
                     <!-- Directory Hint -->
-                    <Label x:Name="LblSaveDirectory" Text="Dateien werden in Downloads/AuraDrop gespeichert (100% Originalqualität)" FontSize="11" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" HorizontalTextAlignment="Center" />
+                    <Label x:Name="LblSaveDirectory" Text="Dateien werden in Downloads/AuraDrop gespeichert&#10;(100% Originalqualität ohne Komprimierung)" FontSize="11" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" HorizontalTextAlignment="Center" Margin="0,4,0,0" />
                 </VerticalStackLayout>
             </ScrollView>
 
             <!-- ==================== VIEW 2: SEND ==================== -->
-            <ScrollView x:Name="ViewSend" IsVisible="False" Padding="16">
+            <ScrollView x:Name="ViewSend" IsVisible="False" VerticalOptions="FillAndExpand" Padding="16">
                 <VerticalStackLayout Spacing="16">
 
                     <!-- Section: Selection (Media, Text, File, Folder) -->
@@ -149,14 +149,14 @@
                         <Label Text="GERÄTE IM WLAN" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource TextMuted}" VerticalOptions="Center" />
                         <HorizontalStackLayout Grid.Column="1" Spacing="10" VerticalOptions="Center">
                             <!-- Refresh Button -->
-                            <Border BackgroundColor="Transparent" Padding="4">
+                            <Border BackgroundColor="Transparent" Stroke="Transparent" Padding="4">
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Tapped="OnRefreshDevicesClicked" />
                                 </Border.GestureRecognizers>
                                 <Path Data="M 23,4 V 10 H 17 M 1,20 V 14 H 7 M 3.51,9 A 9,9 0 0 1 18.36,5.64 L 23,10 M 1,14 L 5.64,18.36 A 9,9 0 0 0 20.49,15" Stroke="{StaticResource TextSecondary}" StrokeThickness="1.8" Aspect="Uniform" WidthRequest="16" HeightRequest="16" />
                             </Border>
                             <!-- Direct IP Button -->
-                            <Border BackgroundColor="Transparent" Padding="4">
+                            <Border BackgroundColor="Transparent" Stroke="Transparent" Padding="4">
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Tapped="OnDirectIpClicked" />
                                 </Border.GestureRecognizers>
@@ -172,7 +172,7 @@
                                 <Border BackgroundColor="{StaticResource CardBackground}" Stroke="{StaticResource CardBorder}" StrokeThickness="1" StrokeShape="RoundRectangle 14" Padding="14,12" Margin="0,0,0,8">
                                     <Grid ColumnDefinitions="40, *, Auto" ColumnSpacing="10">
                                         <!-- Device Icon (Computer or Phone) -->
-                                        <Border Grid.Column="0" WidthRequest="38" HeightRequest="38" BackgroundColor="{StaticResource SurfaceDark}" StrokeShape="RoundRectangle 8">
+                                        <Border Grid.Column="0" WidthRequest="38" HeightRequest="38" BackgroundColor="{StaticResource SurfaceDark}" Stroke="Transparent" StrokeShape="RoundRectangle 8">
                                             <Path Data="M 20,3 H 4 A 2,2 0 0 0 2,5 V 15 A 2,2 0 0 0 4,17 H 20 A 2,2 0 0 0 22,15 V 5 A 2,2 0 0 0 20,3 Z M 8,21 H 16 M 12,17 V 21" Stroke="{StaticResource Primary}" StrokeThickness="1.8" Aspect="Uniform" WidthRequest="18" HeightRequest="18" HorizontalOptions="Center" VerticalOptions="Center" />
                                         </Border>
 
@@ -180,10 +180,10 @@
                                         <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="3">
                                             <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="14" TextColor="{StaticResource TextPrimary}" />
                                             <HorizontalStackLayout Spacing="6">
-                                                <Border BackgroundColor="{StaticResource SurfaceDark}" StrokeShape="RoundRectangle 4" Padding="6,1">
+                                                <Border BackgroundColor="{StaticResource SurfaceDark}" Stroke="Transparent" StrokeShape="RoundRectangle 4" Padding="6,1">
                                                     <Label Text="{Binding IpAddress}" FontSize="10" TextColor="{StaticResource TextSecondary}" />
                                                 </Border>
-                                                <Border BackgroundColor="{StaticResource SurfaceDark}" StrokeShape="RoundRectangle 4" Padding="6,1">
+                                                <Border BackgroundColor="{StaticResource SurfaceDark}" Stroke="Transparent" StrokeShape="RoundRectangle 4" Padding="6,1">
                                                     <Label Text="{Binding DeviceType}" FontSize="10" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
                                                 </Border>
                                             </HorizontalStackLayout>
@@ -209,7 +209,7 @@
             </ScrollView>
 
             <!-- ==================== VIEW 3: SETTINGS ==================== -->
-            <ScrollView x:Name="ViewSettings" IsVisible="False" Padding="16">
+            <ScrollView x:Name="ViewSettings" IsVisible="False" VerticalOptions="FillAndExpand" Padding="16">
                 <VerticalStackLayout Spacing="16">
                     <Label Text="Einstellungen" FontSize="20" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" />
 
@@ -303,42 +303,55 @@
             </Border>
         </Grid>
 
-        <!-- Bottom Navigation Bar -->
-        <Border Grid.Row="2" BackgroundColor="{StaticResource SurfaceDark}" Stroke="{StaticResource CardBorder}" StrokeThickness="0,1,0,0" Padding="12,8">
-            <Grid ColumnDefinitions="*, *, *">
-                <!-- Receive Pill -->
-                <Border Grid.Column="0" x:Name="BorderNavReceive" BackgroundColor="{StaticResource Secondary}" StrokeShape="RoundRectangle 16" Padding="14,6" HorizontalOptions="Center">
-                    <Border.GestureRecognizers>
+        <!-- ==================== MODERN DOCKED BOTTOM NAVIGATION BAR ==================== -->
+        <Grid Grid.Row="2" HeightRequest="68" BackgroundColor="{StaticResource SurfaceDark}" VerticalOptions="End">
+            <!-- Top Hairline Divider -->
+            <BoxView HeightRequest="1" BackgroundColor="{StaticResource CardBorder}" VerticalOptions="Start" />
+
+            <!-- Navigation Tabs (Google Pixel / Material 3 Style) -->
+            <Grid ColumnDefinitions="*, *, *" VerticalOptions="Fill" HorizontalOptions="Fill" Padding="8,4,8,6">
+                <!-- Tab 1: Empfangen -->
+                <Grid Grid.Column="0" HorizontalOptions="Fill" VerticalOptions="Fill">
+                    <Grid.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnNavReceiveClicked" />
-                    </Border.GestureRecognizers>
-                    <VerticalStackLayout Spacing="2" HorizontalOptions="Center">
-                        <Path Data="M 21,15 V 19 A 2,2 0 0 1 19,21 H 5 A 2,2 0 0 1 3,19 V 15 M 7,10 L 12,15 L 17,10 M 12,15 V 3" Stroke="{StaticResource Primary}" StrokeThickness="1.8" Aspect="Uniform" WidthRequest="16" HeightRequest="16" HorizontalOptions="Center" />
-                        <Label x:Name="LblNavReceive" Text="Empfangen" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource Primary}" HorizontalOptions="Center" />
+                    </Grid.GestureRecognizers>
+                    <VerticalStackLayout Spacing="2" HorizontalOptions="Center" VerticalOptions="Center">
+                        <!-- Active Pill Indicator -->
+                        <Border x:Name="BorderNavReceive" BackgroundColor="{StaticResource Secondary}" Stroke="Transparent" StrokeShape="RoundRectangle 16" WidthRequest="56" HeightRequest="32">
+                            <Path x:Name="PathNavReceive" Data="M 21,15 V 19 A 2,2 0 0 1 19,21 H 5 A 2,2 0 0 1 3,19 V 15 M 7,10 L 12,15 L 17,10 M 12,15 V 3" Stroke="{StaticResource Primary}" StrokeThickness="1.8" Aspect="Uniform" WidthRequest="18" HeightRequest="18" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <Label x:Name="LblNavReceive" Text="Empfangen" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource Primary}" HorizontalOptions="Center" HorizontalTextAlignment="Center" LineBreakMode="NoWrap" />
                     </VerticalStackLayout>
-                </Border>
+                </Grid>
 
-                <!-- Send Pill -->
-                <Border Grid.Column="1" x:Name="BorderNavSend" BackgroundColor="Transparent" StrokeShape="RoundRectangle 16" Padding="14,6" HorizontalOptions="Center">
-                    <Border.GestureRecognizers>
+                <!-- Tab 2: Senden -->
+                <Grid Grid.Column="1" HorizontalOptions="Fill" VerticalOptions="Fill">
+                    <Grid.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnNavSendClicked" />
-                    </Border.GestureRecognizers>
-                    <VerticalStackLayout Spacing="2" HorizontalOptions="Center">
-                        <Path Data="M 22,2 L 11,13 M 22,2 L 15,22 L 11,13 L 2,9 Z" Stroke="{StaticResource TextSecondary}" StrokeThickness="1.8" Aspect="Uniform" WidthRequest="16" HeightRequest="16" HorizontalOptions="Center" />
-                        <Label x:Name="LblNavSend" Text="Senden" FontSize="11" FontAttributes="None" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" />
+                    </Grid.GestureRecognizers>
+                    <VerticalStackLayout Spacing="2" HorizontalOptions="Center" VerticalOptions="Center">
+                        <!-- Active Pill Indicator -->
+                        <Border x:Name="BorderNavSend" BackgroundColor="Transparent" Stroke="Transparent" StrokeShape="RoundRectangle 16" WidthRequest="56" HeightRequest="32">
+                            <Path x:Name="PathNavSend" Data="M 22,2 L 11,13 M 22,2 L 15,22 L 11,13 L 2,9 Z" Stroke="{StaticResource TextMuted}" StrokeThickness="1.8" Aspect="Uniform" WidthRequest="18" HeightRequest="18" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <Label x:Name="LblNavSend" Text="Senden" FontSize="11" FontAttributes="None" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" HorizontalTextAlignment="Center" LineBreakMode="NoWrap" />
                     </VerticalStackLayout>
-                </Border>
+                </Grid>
 
-                <!-- Settings Pill -->
-                <Border Grid.Column="2" x:Name="BorderNavSettings" BackgroundColor="Transparent" StrokeShape="RoundRectangle 16" Padding="14,6" HorizontalOptions="Center">
-                    <Border.GestureRecognizers>
+                <!-- Tab 3: Einstellungen -->
+                <Grid Grid.Column="2" HorizontalOptions="Fill" VerticalOptions="Fill">
+                    <Grid.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnNavSettingsClicked" />
-                    </Border.GestureRecognizers>
-                    <VerticalStackLayout Spacing="2" HorizontalOptions="Center">
-                        <Path Data="M 12,15 A 3,3 0 1 0 12,9 A 3,3 0 0 0 12,15 Z M 19.4,15 A 1.65,1.65 0 0 0 19.73,16.82 L 19.79,16.88 A 2,2 0 0 1 16.96,19.71 L 16.9,19.65 A 1.65,1.65 0 0 0 15.08,19.32 A 1.65,1.65 0 0 0 14,20.83 V 21 A 2,2 0 0 1 10,21 V 20.91 A 1.65,1.65 0 0 0 9,19.4 A 1.65,1.65 0 0 0 7.18,19.73 L 7.12,19.79 A 2,2 0 0 1 4.29,16.96 L 4.35,16.9 A 1.65,1.65 0 0 0 4.68,15.08 A 1.65,1.65 0 0 0 3.17,14 H 3 A 2,2 0 0 1 3,10 H 3.09 A 1.65,1.65 0 0 0 4.6,9 A 1.65,1.65 0 0 0 4.27,7.18 L 4.21,7.12 A 2,2 0 0 1 7.04,4.29 L 7.1,4.35 A 1.65,1.65 0 0 0 8.92,4.68 A 1.65,1.65 0 0 0 10,3.17 V 3 A 2,2 0 0 1 14,3 V 3.09 A 1.65,1.65 0 0 0 15,4.6 A 1.65,1.65 0 0 0 16.82,4.27 L 16.88,4.21 A 2,2 0 0 1 19.71,7.04 L 19.65,7.1 A 1.65,1.65 0 0 0 19.32,8.92 A 1.65,1.65 0 0 0 20.83,10 H 21 A 2,2 0 0 1 21,14 H 20.91 A 1.65,1.65 0 0 0 19.4,15 Z" Stroke="{StaticResource TextSecondary}" StrokeThickness="1.8" Aspect="Uniform" WidthRequest="16" HeightRequest="16" HorizontalOptions="Center" />
-                        <Label x:Name="LblNavSettings" Text="Einstellungen" FontSize="11" FontAttributes="None" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" />
+                    </Grid.GestureRecognizers>
+                    <VerticalStackLayout Spacing="2" HorizontalOptions="Center" VerticalOptions="Center">
+                        <!-- Active Pill Indicator -->
+                        <Border x:Name="BorderNavSettings" BackgroundColor="Transparent" Stroke="Transparent" StrokeShape="RoundRectangle 16" WidthRequest="56" HeightRequest="32">
+                            <Path x:Name="PathNavSettings" Data="M 12,15 A 3,3 0 1 0 12,9 A 3,3 0 0 0 12,15 Z M 19.4,15 A 1.65,1.65 0 0 0 19.73,16.82 L 19.79,16.88 A 2,2 0 0 1 16.96,19.71 L 16.9,19.65 A 1.65,1.65 0 0 0 15.08,19.32 A 1.65,1.65 0 0 0 14,20.83 V 21 A 2,2 0 0 1 10,21 V 20.91 A 1.65,1.65 0 0 0 9,19.4 A 1.65,1.65 0 0 0 7.18,19.73 L 7.12,19.79 A 2,2 0 0 1 4.29,16.96 L 4.35,16.9 A 1.65,1.65 0 0 0 4.68,15.08 A 1.65,1.65 0 0 0 3.17,14 H 3 A 2,2 0 0 1 3,10 H 3.09 A 1.65,1.65 0 0 0 4.6,9 A 1.65,1.65 0 0 0 4.27,7.18 L 4.21,7.12 A 2,2 0 0 1 7.04,4.29 L 7.1,4.35 A 1.65,1.65 0 0 0 8.92,4.68 A 1.65,1.65 0 0 0 10,3.17 V 3 A 2,2 0 0 1 14,3 V 3.09 A 1.65,1.65 0 0 0 15,4.6 A 1.65,1.65 0 0 0 16.82,4.27 L 16.88,4.21 A 2,2 0 0 1 19.71,7.04 L 19.65,7.1 A 1.65,1.65 0 0 0 19.32,8.92 A 1.65,1.65 0 0 0 20.83,10 H 21 A 2,2 0 0 1 21,14 H 20.91 A 1.65,1.65 0 0 0 19.4,15 Z" Stroke="{StaticResource TextMuted}" StrokeThickness="1.8" Aspect="Uniform" WidthRequest="18" HeightRequest="18" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <Label x:Name="LblNavSettings" Text="Einstellungen" FontSize="11" FontAttributes="None" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" HorizontalTextAlignment="Center" LineBreakMode="NoWrap" />
                     </VerticalStackLayout>
-                </Border>
+                </Grid>
             </Grid>
-        </Border>
+        </Grid>
     </Grid>
 </ContentPage>

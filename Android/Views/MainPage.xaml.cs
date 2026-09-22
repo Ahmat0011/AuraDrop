@@ -545,15 +545,22 @@ public partial class MainPage : ContentPage
         var secondaryColor = (Color)Application.Current!.Resources["Secondary"];
         var primaryColor = (Color)Application.Current!.Resources["Primary"];
         var textColor = (Color)Application.Current!.Resources["TextSecondary"];
+        var mutedColor = (Color)Application.Current!.Resources["TextMuted"];
 
         BorderNavReceive.BackgroundColor = isReceive ? secondaryColor : Colors.Transparent;
         LblNavReceive.TextColor = isReceive ? primaryColor : textColor;
+        LblNavReceive.FontAttributes = isReceive ? FontAttributes.Bold : FontAttributes.None;
+        PathNavReceive.Stroke = isReceive ? primaryColor : mutedColor;
 
         BorderNavSend.BackgroundColor = isSend ? secondaryColor : Colors.Transparent;
         LblNavSend.TextColor = isSend ? primaryColor : textColor;
+        LblNavSend.FontAttributes = isSend ? FontAttributes.Bold : FontAttributes.None;
+        PathNavSend.Stroke = isSend ? primaryColor : mutedColor;
 
         BorderNavSettings.BackgroundColor = isSettings ? secondaryColor : Colors.Transparent;
         LblNavSettings.TextColor = isSettings ? primaryColor : textColor;
+        LblNavSettings.FontAttributes = isSettings ? FontAttributes.Bold : FontAttributes.None;
+        PathNavSettings.Stroke = isSettings ? primaryColor : mutedColor;
     }
 
     #endregion
