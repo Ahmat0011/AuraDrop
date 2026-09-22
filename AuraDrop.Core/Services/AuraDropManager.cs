@@ -61,13 +61,49 @@ public class AuraDropManager : IDisposable
         Server.Stop();
     }
 
+    public bool PinRequired
+    {
+        get => Server.PinRequired;
+        set
+        {
+            Server.PinRequired = value;
+            CurrentDevice.PinRequired = value;
+        }
+    }
+
+    public string ConfiguredPin
+    {
+        get => Server.ConfiguredPin;
+        set => Server.ConfiguredPin = value;
+    }
+
     public async Task<bool> SendFilesToDeviceAsync(
         DeviceInfo target,
         IEnumerable<string> filePaths,
         Action<TransferProgress>? onProgress = null,
         CancellationToken token = default)
     {
+        return await SendFilesToDeviceAsync(target, filePaths, null, onProgress, token);
+    }
+
+    public async Task<bool> SendFilesToDeviceAsync(
+        DeviceInfo target,
+        IEnumerable<string> filePaths,
+        string? pinCode,
+        Action<TransferProgress>? onProgress = null,
+        CancellationToken token = default)
+    {
         var files = CreateFileList(filePaths);
+        return await SendTransferFilesAsync(target, files, pinCode, onProgress, token);
+    }
+
+    public async Task<bool> SendTransferFilesAsync(
+        DeviceInfo target,
+        List<TransferFile> files,
+        string? pinCode = null,
+        Action<TransferProgress>? onProgress = null,
+        CancellationToken token = default)
+    {
         if (files.Count == 0) throw new ArgumentException("Keine gültigen Dateien ausgewählt.");
 
         var session = new TransferSession
@@ -75,17 +111,19 @@ public class AuraDropManager : IDisposable
             Sender = CurrentDevice,
             Receiver = target,
             Files = files,
+            PinCode = pinCode,
             Status = SessionStatus.Pending
         };
 
         OutgoingTransferStarted?.Invoke(session);
 
         // 1. Request transfer
-        var (accepted, tokenStr) = await Client.RequestTransferAsync(target, session, token);
+        var (accepted, tokenStr, errorMsg) = await Client.RequestTransferAsync(target, session, token);
         if (!accepted)
         {
             session.Status = SessionStatus.Rejected;
-            OutgoingTransferFailed?.Invoke(session, "Übertragung wurde vom Empfänger abgelehnt.");
+            var reason = !string.IsNullOrEmpty(errorMsg) ? errorMsg : "Übertragung wurde vom Empfänger abgelehnt.";
+            OutgoingTransferFailed?.Invoke(session, reason);
             return false;
         }
 
@@ -104,7 +142,7 @@ public class AuraDropManager : IDisposable
                 FileCount = files.Count,
                 TotalBytes = session.TotalBytes,
                 FileNames = files.Select(f => f.FileName).ToList(),
-                SavedPaths = files.Select(f => f.LocalPath ?? "").ToList(),
+                SavedPaths = files.Select(f => f.LocalPath ?? f.FileName).ToList(),
                 Status = SessionStatus.Completed
             });
 
@@ -122,6 +160,11 @@ public class AuraDropManager : IDisposable
     public string CreatePinSession(IEnumerable<string> filePaths)
     {
         var files = CreateFileList(filePaths);
+        return CreatePinSession(files);
+    }
+
+    public string CreatePinSession(List<TransferFile> files)
+    {
         if (files.Count == 0) throw new ArgumentException("Keine gültigen Dateien ausgewählt.");
 
         var session = new TransferSession
@@ -296,7 +339,9 @@ public class AuraDropManager : IDisposable
             {
                 DeviceName = CurrentDevice.Name,
                 DownloadDirectory = Server.DownloadDirectory,
-                AutoAccept = Server.AutoAcceptTransfers
+                AutoAccept = Server.AutoAcceptTransfers,
+                PinRequired = PinRequired,
+                ConfiguredPin = ConfiguredPin
             };
             File.WriteAllText(_settingsFilePath, JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true }));
         }
@@ -317,6 +362,10 @@ public class AuraDropManager : IDisposable
                     Server.DownloadDirectory = ddProp.GetString()!;
                 if (doc.RootElement.TryGetProperty("AutoAccept", out var aaProp))
                     Server.AutoAcceptTransfers = aaProp.GetBoolean();
+                if (doc.RootElement.TryGetProperty("PinRequired", out var prProp))
+                    PinRequired = prProp.GetBoolean();
+                if (doc.RootElement.TryGetProperty("ConfiguredPin", out var cpProp) && !string.IsNullOrWhiteSpace(cpProp.GetString()))
+                    ConfiguredPin = cpProp.GetString()!;
             }
         }
         catch { }

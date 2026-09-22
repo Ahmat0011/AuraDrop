@@ -62,6 +62,9 @@ public partial class MainPage : ContentPage
         SwitchAutoAccept.IsToggled = _manager.Server.AutoAcceptTransfers;
         LblQuickSaveStatus.Text = _manager.Server.AutoAcceptTransfers ? "An" : "Aus";
 
+        SwitchPinProtection.IsToggled = _manager.PinRequired;
+        EntryPinConfig.Text = _manager.ConfiguredPin;
+
         RefreshHistory();
 
         try
@@ -104,6 +107,7 @@ public partial class MainPage : ContentPage
                     existing.Name = device.Name;
                     existing.IpAddress = device.IpAddress;
                     existing.Port = device.Port;
+                    existing.PinRequired = device.PinRequired;
                 }
             });
         };
@@ -127,7 +131,7 @@ public partial class MainPage : ContentPage
             return await MainThread.InvokeOnMainThreadAsync(async () =>
             {
                 return await DisplayAlert(
-                    "📥 Eingehende Übertragung",
+                    "Eingehende Übertragung",
                     $"{session.Sender.Name} ({session.Sender.IpAddress}) möchte {session.Files.Count} Datei(en) ({session.FormattedTotalSize}) senden.\n\nAkzeptieren?",
                     "Akzeptieren",
                     "Ablehnen");
@@ -149,7 +153,7 @@ public partial class MainPage : ContentPage
             {
                 ModalProgress.IsVisible = false;
                 RefreshHistory();
-                await DisplayAlert("✅ Erfolgreich", $"{session.Files.Count} Datei(en) empfangen und gespeichert!", "OK");
+                await DisplayAlert("Erfolgreich", $"{session.Files.Count} Datei(en) in Originalqualität empfangen!", "OK");
             });
         };
 
@@ -158,7 +162,7 @@ public partial class MainPage : ContentPage
             MainThread.BeginInvokeOnMainThread(async () =>
             {
                 ModalProgress.IsVisible = false;
-                await DisplayAlert("❌ Fehler", $"Übertragung fehlgeschlagen:\n{error}", "OK");
+                await DisplayAlert("Fehler", $"Übertragung fehlgeschlagen:\n{error}", "OK");
             });
         };
 
@@ -213,11 +217,11 @@ public partial class MainPage : ContentPage
         {
             var results = await FilePicker.Default.PickMultipleAsync(new PickOptions
             {
-                PickerTitle = "Fotos & Videos auswählen",
+                PickerTitle = "Fotos & Videos in Originalqualität auswählen",
                 FileTypes = FilePickerFileType.Images
             });
 
-            if (results != null) AddPickedFiles(results);
+            if (results != null) await AddPickedFilesAsync(results);
         }
         catch (Exception ex)
         {
@@ -234,18 +238,12 @@ public partial class MainPage : ContentPage
                 PickerTitle = "Dateien auswählen"
             });
 
-            if (results != null) AddPickedFiles(results);
+            if (results != null) await AddPickedFilesAsync(results);
         }
         catch (Exception ex)
         {
             await DisplayAlert("Fehler", $"Datei-Auswahl fehlgeschlagen: {ex.Message}", "OK");
         }
-    }
-
-    private async void OnPickFolderClicked(object? sender, EventArgs e)
-    {
-        await DisplayAlert("Folder", "Wähle über die Dateiauswahl mehrere Dateien aus einem Ordner aus.", "OK");
-        OnPickFilesClicked(sender, e);
     }
 
     private async void OnSendTextClicked(object? sender, EventArgs e)
@@ -266,23 +264,32 @@ public partial class MainPage : ContentPage
         }
     }
 
-    private void AddPickedFiles(IEnumerable<FileResult?> files)
+    private async Task AddPickedFilesAsync(IEnumerable<FileResult?> files)
     {
         foreach (var file in files)
         {
             if (file == null) continue;
-            if (!_selectedFiles.Any(f => f.LocalPath == file.FullPath))
-            {
-                long size = 0;
-                try { size = new FileInfo(file.FullPath).Length; } catch { }
+            if (_selectedFiles.Any(f => f.LocalPath == file.FullPath || f.FileName == file.FileName))
+                continue;
 
-                _selectedFiles.Add(new TransferFile
-                {
-                    FileName = file.FileName,
-                    FileSize = size,
-                    LocalPath = file.FullPath
-                });
+            long size = 0;
+            try
+            {
+                using var stream = await file.OpenReadAsync();
+                size = stream.Length;
             }
+            catch
+            {
+                try { size = new FileInfo(file.FullPath).Length; } catch { }
+            }
+
+            _selectedFiles.Add(new TransferFile
+            {
+                FileName = file.FileName,
+                FileSize = size,
+                LocalPath = file.FullPath,
+                OpenStreamAsync = async () => await file.OpenReadAsync()
+            });
         }
         UpdateUiState();
     }
@@ -303,11 +310,18 @@ public partial class MainPage : ContentPage
 
         if (_selectedFiles.Count == 0)
         {
-            await DisplayAlert("AuraDrop", "Bitte wähle zuerst mindestens ein Element aus (Media, Text, File).", "OK");
+            await DisplayAlert("AuraDrop", "Bitte wähle zuerst mindestens eine Datei aus.", "OK");
             return;
         }
 
-        var filePaths = _selectedFiles.Where(f => !string.IsNullOrEmpty(f.LocalPath)).Select(f => f.LocalPath!).ToList();
+        string? pinCode = null;
+        if (target.PinRequired)
+        {
+            pinCode = await DisplayPromptAsync("PIN erforderlich", $"{target.Name} erfordert einen 6-stelligen PIN:", keyboard: Keyboard.Numeric, maxLength: 6);
+            if (string.IsNullOrWhiteSpace(pinCode)) return;
+        }
+
+        var filesToSend = _selectedFiles.ToList();
 
         _activeTransferCts = new CancellationTokenSource();
         ModalProgress.IsVisible = true;
@@ -315,7 +329,7 @@ public partial class MainPage : ContentPage
 
         try
         {
-            var success = await _manager.SendFilesToDeviceAsync(target, filePaths, progress =>
+            var success = await _manager.SendTransferFilesAsync(target, filesToSend, pinCode, progress =>
             {
                 MainThread.BeginInvokeOnMainThread(() => UpdateProgress(progress, isReceiving: false));
             }, _activeTransferCts.Token);
@@ -324,7 +338,7 @@ public partial class MainPage : ContentPage
 
             if (success)
             {
-                await DisplayAlert("✅ Erfolgreich", $"Dateien erfolgreich an {target.Name} übertragen!", "OK");
+                await DisplayAlert("Erfolgreich", $"Dateien erfolgreich an {target.Name} übertragen!", "OK");
                 _selectedFiles.Clear();
                 UpdateUiState();
             }
@@ -337,7 +351,7 @@ public partial class MainPage : ContentPage
         catch (Exception ex)
         {
             ModalProgress.IsVisible = false;
-            await DisplayAlert("❌ Fehler", $"Fehler bei der Übertragung:\n{ex.Message}", "OK");
+            await DisplayAlert("Fehler", $"Fehler bei der Übertragung:\n{ex.Message}", "OK");
         }
         finally
         {
@@ -345,16 +359,16 @@ public partial class MainPage : ContentPage
         }
     }
 
-    private async void OnGeneratePinClicked(object? sender, EventArgs e)
+    private void OnGeneratePinClicked(object? sender, EventArgs e)
     {
         if (_selectedFiles.Count == 0)
         {
-            await DisplayAlert("AuraDrop", "Bitte wähle zuerst Dateien aus, um einen PIN zu generieren.", "OK");
+            DisplayAlert("AuraDrop", "Bitte wähle zuerst Dateien aus, um einen PIN zu generieren.", "OK");
             return;
         }
 
-        var filePaths = _selectedFiles.Where(f => !string.IsNullOrEmpty(f.LocalPath)).Select(f => f.LocalPath!).ToList();
-        var pin = _manager.CreatePinSession(filePaths);
+        var files = _selectedFiles.ToList();
+        var pin = _manager.CreatePinSession(files);
 
         LblGeneratedPin.Text = PinCodeManager.FormatPin(pin);
         ModalPinDisplay.IsVisible = true;
@@ -370,11 +384,12 @@ public partial class MainPage : ContentPage
         _activeTransferCts?.Cancel();
     }
 
-    private async void OnFetchViaPinClicked(object? sender, EventArgs e)
+    private async void OnPromptFetchPinClicked(object? sender, EventArgs e)
     {
-        var pin = EntryPin.Text?.Trim() ?? "";
-        var cleanPin = PinCodeManager.NormalizePin(pin);
+        var pin = await DisplayPromptAsync("PIN abholen", "Gib den 6-stelligen Code des Absenders ein:", keyboard: Keyboard.Numeric, maxLength: 6);
+        if (string.IsNullOrWhiteSpace(pin)) return;
 
+        var cleanPin = PinCodeManager.NormalizePin(pin);
         if (cleanPin.Length != 6)
         {
             await DisplayAlert("Ungültiger PIN", "Der PIN muss genau 6 Ziffern lang sein.", "OK");
@@ -396,13 +411,13 @@ public partial class MainPage : ContentPage
 
             if (success)
             {
-                await DisplayAlert("✅ Fertig", "Dateien erfolgreich heruntergeladen!", "OK");
+                await DisplayAlert("Fertig", "Dateien erfolgreich empfangen!", "OK");
             }
         }
         catch (Exception ex)
         {
             ModalProgress.IsVisible = false;
-            await DisplayAlert("❌ Fehler", $"Download fehlgeschlagen:\n{ex.Message}", "OK");
+            await DisplayAlert("Fehler", $"Download fehlgeschlagen:\n{ex.Message}", "OK");
         }
         finally
         {
@@ -444,13 +459,25 @@ public partial class MainPage : ContentPage
             return;
         }
 
-        var summary = string.Join("\n\n", _manager.History.Take(5).Select(h => $"{h.DirectionIcon} {h.PeerName}: {h.FileCount} Datei(en) ({h.FormattedSize})\n{h.Timestamp:dd.MM.yyyy HH:mm}"));
-        await DisplayAlert("Letzte Übertragungen", summary, "OK");
+        var summary = string.Join("\n\n", _manager.History.Take(6).Select(h => $"{h.DirectionIcon} {h.PeerName}: {h.FileCount} Datei(en) ({h.FormattedSize})\n{h.Timestamp:dd.MM.yyyy HH:mm}"));
+        await DisplayAlert("Übertragungsverlauf", summary, "OK");
     }
 
     private async void OnOpenInfoClicked(object? sender, EventArgs e)
     {
-        await DisplayAlert("AuraDrop", "Version 1.0.0\n\nP2P Dateitransfer für Android und Windows.\nOhne Cloud, ohne Größenbeschränkung, maximale WLAN-Geschwindigkeit.", "OK");
+        await DisplayAlert("Über AuraDrop", "AuraDrop v1.0.0\n\nDirekter, unkomprimierter P2P-Dateitransfer im lokalen Netzwerk.\nBilder und Videos werden in 100% Originalqualität übertragen.", "OK");
+    }
+
+    private void OnSaveDeviceNameClicked(object? sender, EventArgs e)
+    {
+        var newName = EntryDeviceName.Text?.Trim();
+        if (!string.IsNullOrWhiteSpace(newName))
+        {
+            _manager.CurrentDevice.Name = newName;
+            LblCenterDeviceName.Text = newName;
+            _manager.SaveSettings();
+            DisplayAlert("Gespeichert", "Gerätename wurde aktualisiert.", "OK");
+        }
     }
 
     private void OnAutoAcceptToggled(object? sender, ToggledEventArgs e)
@@ -460,21 +487,33 @@ public partial class MainPage : ContentPage
         _manager.SaveSettings();
     }
 
-    private async void OnSaveDeviceNameClicked(object? sender, EventArgs e)
+    private void OnPinProtectionToggled(object? sender, ToggledEventArgs e)
     {
-        var name = EntryDeviceName.Text?.Trim();
-        if (!string.IsNullOrEmpty(name))
+        _manager.PinRequired = e.Value;
+        _manager.SaveSettings();
+    }
+
+    private void OnPinConfigChanged(object? sender, TextChangedEventArgs e)
+    {
+        var text = EntryPinConfig.Text?.Trim() ?? "";
+        if (text.Length == 6 && int.TryParse(text, out _))
         {
-            _manager.CurrentDevice.Name = name;
-            LblCenterDeviceName.Text = name;
+            _manager.ConfiguredPin = text;
             _manager.SaveSettings();
-            await DisplayAlert("Gespeichert", "Gerätename wurde aktualisiert.", "OK");
         }
+    }
+
+    private void OnGenerateNewPinClicked(object? sender, EventArgs e)
+    {
+        var randomPin = Random.Shared.Next(100000, 999999).ToString();
+        EntryPinConfig.Text = randomPin;
+        _manager.ConfiguredPin = randomPin;
+        _manager.SaveSettings();
     }
 
     #endregion
 
-    #region Navigation Bar
+    #region Navigation
 
     private void OnNavReceiveClicked(object? sender, EventArgs e)
     {
@@ -525,20 +564,24 @@ public class RadarOrbDrawable : IDrawable
     {
         var cx = dirtyRect.Width / 2;
         var cy = dirtyRect.Height / 2;
-        var mintColor = Color.FromArgb("#5CD6B0");
+        var cyanColor = Color.FromArgb("#38BDF8");
+        var indigoColor = Color.FromArgb("#6366F1");
 
         canvas.Antialias = true;
 
         // Draw solid center core circle
-        canvas.FillColor = mintColor;
-        canvas.FillCircle(cx, cy, 33);
+        canvas.FillColor = indigoColor;
+        canvas.FillCircle(cx, cy, 32);
+
+        canvas.FillColor = cyanColor;
+        canvas.FillCircle(cx, cy, 24);
 
         // Draw 6 orbital arc segments
-        canvas.StrokeColor = mintColor;
-        canvas.StrokeSize = 10;
+        canvas.StrokeColor = cyanColor;
+        canvas.StrokeSize = 8;
         canvas.StrokeLineCap = LineCap.Round;
 
-        float outerRadius = 58;
+        float outerRadius = 56;
         for (int i = 0; i < 6; i++)
         {
             float startAngle = i * 60 + 12;

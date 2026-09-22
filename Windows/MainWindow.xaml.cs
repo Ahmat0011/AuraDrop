@@ -52,6 +52,9 @@ public partial class MainWindow : Window
         TxtReceiveFolder.Text = _manager.Server.DownloadDirectory;
         TxtSettingsNetwork.Text = $"IP: {_manager.CurrentDevice.IpAddress} | Port: {_manager.CurrentDevice.Port} | Discovery: 52526";
 
+        ChkPinProtection.IsChecked = _manager.PinRequired;
+        TxtSettingsPinCode.Text = _manager.ConfiguredPin;
+
         UpdateQuickSaveButtons();
         RefreshHistoryList();
 
@@ -94,6 +97,7 @@ public partial class MainWindow : Window
                     existing.Name = device.Name;
                     existing.IpAddress = device.IpAddress;
                     existing.Port = device.Port;
+                    existing.PinRequired = device.PinRequired;
                     existing.LastSeen = device.LastSeen;
                 }
             });
@@ -118,7 +122,7 @@ public partial class MainWindow : Window
             return await Dispatcher.InvokeAsync(() =>
             {
                 _incomingRequestTcs = new TaskCompletionSource<bool>();
-                TxtIncomingPromptMessage.Text = $"{session.Sender.Name} ({session.Sender.IpAddress}) möchte {session.Files.Count} Datei(en) ({session.FormattedTotalSize}) senden.";
+                TxtIncomingPromptMessage.Text = $"{session.Sender.Name} ({session.Sender.IpAddress}) möchte {session.Files.Count} Datei(en) ({session.FormattedTotalSize}) an dich senden.";
                 BorderIncomingPrompt.Visibility = Visibility.Visible;
                 return _incomingRequestTcs.Task;
             }).Task.Unwrap();
@@ -196,6 +200,40 @@ public partial class MainWindow : Window
         TxtProgressEta.Text = $"Restzeit: {progress.FormattedEta}";
     }
 
+    #region Window Controls & Dragging
+
+    private void TitleBar_MouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton == MouseButton.Left)
+        {
+            if (e.ClickCount == 2)
+            {
+                WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+            }
+            else
+            {
+                DragMove();
+            }
+        }
+    }
+
+    private void BtnMinimize_Click(object sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState.Minimized;
+    }
+
+    private void BtnMaximize_Click(object sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+    }
+
+    private void BtnClose_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
+
+    #endregion
+
     #region Drag and Drop & File Selection
 
     private void Window_DragEnter(object sender, DragEventArgs e)
@@ -254,7 +292,6 @@ public partial class MainWindow : Window
 
     private void BtnSendText_Click(object sender, RoutedEventArgs e)
     {
-        // Prompt for text or use clipboard content
         var clip = Clipboard.GetText();
         var tempFile = Path.Combine(Path.GetTempPath(), $"Text_{DateTime.Now:yyyyMMdd_HHmmss}.txt");
         
@@ -324,8 +361,18 @@ public partial class MainWindow : Window
 
         if (_selectedFiles.Count == 0)
         {
-            MessageBox.Show("Bitte wähle zuerst mindestens eine Datei aus (Media, File oder Folder).", "AuraDrop", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show("Bitte wähle zuerst mindestens eine Datei aus (Medien, Dateien oder Ordner).", "AuraDrop", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
+        }
+
+        string? pinCode = null;
+        if (target.PinRequired)
+        {
+            pinCode = Microsoft.VisualBasic.Interaction.InputBox(
+                $"{target.Name} erfordert einen 6-stelligen Sicherheits-PIN zur Übertragung.\nBitte gib den PIN des Empfängers ein:",
+                "PIN-Schutz Autorisierung", "");
+            
+            if (string.IsNullOrWhiteSpace(pinCode)) return;
         }
 
         var filePaths = _selectedFiles.Where(f => !string.IsNullOrEmpty(f.LocalPath)).Select(f => f.LocalPath!).ToList();
@@ -336,7 +383,7 @@ public partial class MainWindow : Window
 
         try
         {
-            var success = await _manager.SendFilesToDeviceAsync(target, filePaths, progress =>
+            var success = await _manager.SendFilesToDeviceAsync(target, filePaths, pinCode, progress =>
             {
                 Dispatcher.InvokeAsync(() => UpdateProgressUi(progress, isReceiving: false));
             }, _activeTransferCts.Token);
@@ -370,7 +417,7 @@ public partial class MainWindow : Window
     {
         if (_selectedFiles.Count == 0)
         {
-            MessageBox.Show("Bitte wähle zuerst Dateien aus, um einen PIN zu generieren.", "AuraDrop", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show("Bitte wähle zuerst Dateien aus, um einen Transfer-PIN zu generieren.", "AuraDrop", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
 
@@ -384,6 +431,17 @@ public partial class MainWindow : Window
     private void BtnClosePinOverlay_Click(object sender, RoutedEventArgs e)
     {
         BorderPinDisplay.Visibility = Visibility.Collapsed;
+    }
+
+    private void BtnOpenFetchPinDialog_Click(object sender, RoutedEventArgs e)
+    {
+        TxtInputPin.Text = "";
+        BorderFetchPinModal.Visibility = Visibility.Visible;
+    }
+
+    private void BtnCloseFetchPinModal_Click(object sender, RoutedEventArgs e)
+    {
+        BorderFetchPinModal.Visibility = Visibility.Collapsed;
     }
 
     private void BtnCancelTransfer_Click(object sender, RoutedEventArgs e)
@@ -401,6 +459,8 @@ public partial class MainWindow : Window
             MessageBox.Show("Bitte gib einen gültigen 6-stelligen PIN ein.", "AuraDrop", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
+
+        BorderFetchPinModal.Visibility = Visibility.Collapsed;
 
         _activeTransferCts = new CancellationTokenSource();
         BorderLiveProgress.Visibility = Visibility.Visible;
@@ -462,13 +522,37 @@ public partial class MainWindow : Window
 
     #endregion
 
-    #region Quick Save & Navigation
+    #region Settings & Navigation
+
+    private void ChkPinProtection_Click(object sender, RoutedEventArgs e)
+    {
+        _manager.PinRequired = ChkPinProtection.IsChecked == true;
+        _manager.SaveSettings();
+    }
+
+    private void TxtSettingsPinCode_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        var text = TxtSettingsPinCode.Text.Trim();
+        if (text.Length == 6 && int.TryParse(text, out _))
+        {
+            _manager.ConfiguredPin = text;
+            _manager.SaveSettings();
+        }
+    }
+
+    private void BtnGenerateNewPin_Click(object sender, RoutedEventArgs e)
+    {
+        var randomPin = Random.Shared.Next(100000, 999999).ToString();
+        TxtSettingsPinCode.Text = randomPin;
+        _manager.ConfiguredPin = randomPin;
+        _manager.SaveSettings();
+    }
 
     private void BtnQuickSave_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Button btn && btn.Tag is string mode)
         {
-            _manager.Server.AutoAcceptTransfers = (mode == "On" || mode == "Fav");
+            _manager.Server.AutoAcceptTransfers = (mode == "On");
             _manager.SaveSettings();
             UpdateQuickSaveButtons();
         }
@@ -478,15 +562,15 @@ public partial class MainWindow : Window
     {
         var isAuto = _manager.Server.AutoAcceptTransfers;
         var activeBrush = (System.Windows.Media.Brush)FindResource("PillActive");
-        var mintBrush = (System.Windows.Media.Brush)FindResource("AccentMint");
+        var cyanBrush = (System.Windows.Media.Brush)FindResource("AccentCyan");
         var transparentBrush = System.Windows.Media.Brushes.Transparent;
         var textMuted = (System.Windows.Media.Brush)FindResource("TextMuted");
 
         BtnQuickSaveOff.Background = !isAuto ? activeBrush : transparentBrush;
-        BtnQuickSaveOff.Foreground = !isAuto ? mintBrush : textMuted;
+        BtnQuickSaveOff.Foreground = !isAuto ? cyanBrush : textMuted;
 
         BtnQuickSaveOn.Background = isAuto ? activeBrush : transparentBrush;
-        BtnQuickSaveOn.Foreground = isAuto ? mintBrush : textMuted;
+        BtnQuickSaveOn.Foreground = isAuto ? cyanBrush : textMuted;
     }
 
     private void TabBtn_Checked(object sender, RoutedEventArgs e)
@@ -518,7 +602,7 @@ public partial class MainWindow : Window
 
     private void BtnOpenInfo_Click(object sender, RoutedEventArgs e)
     {
-        MessageBox.Show("AuraDrop v1.0.0\n\nUltraschneller, verschlüsselter P2P-Dateitransfer über lokales WLAN.\nKompatibel zwischen Windows und Android.\nInspiriert von LocalSend & Send Anywhere.", "Über AuraDrop", MessageBoxButton.OK, MessageBoxImage.Information);
+        MessageBox.Show("AuraDrop v1.0.0\n\nUltraschneller, direkter P2P-Dateitransfer über lokales WLAN.\nKompatibel zwischen Windows und Android.\nVolle Originalqualität ohne Komprimierung.", "Über AuraDrop", MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
     private void BtnOpenHistoryFolder_Click(object sender, RoutedEventArgs e)

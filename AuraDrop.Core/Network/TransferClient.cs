@@ -61,7 +61,7 @@ public class TransferClient
         return null;
     }
 
-    public async Task<(bool Accepted, string? Token)> RequestTransferAsync(DeviceInfo target, TransferSession session, CancellationToken token = default)
+    public async Task<(bool Accepted, string? Token, string? ErrorMessage)> RequestTransferAsync(DeviceInfo target, TransferSession session, CancellationToken token = default)
     {
         try
         {
@@ -69,6 +69,11 @@ public class TransferClient
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync($"http://{target.IpAddress}:{target.Port}/api/transfer/request", content, token);
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                return (false, null, "PIN erforderlich oder ungültig");
+            }
+
             if (response.IsSuccessStatusCode)
             {
                 var resJson = await response.Content.ReadAsStringAsync(token);
@@ -81,14 +86,17 @@ public class TransferClient
                     session.SecurityToken = securityToken;
                 }
 
-                return (accepted, securityToken);
+                return (accepted, securityToken, accepted ? null : "Übertragung wurde abgelehnt.");
             }
+
+            var err = await response.Content.ReadAsStringAsync(token);
+            return (false, null, !string.IsNullOrWhiteSpace(err) ? err : $"Fehler: {response.StatusCode}");
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[TransferClient] Request error: {ex.Message}");
+            return (false, null, ex.Message);
         }
-        return (false, null);
     }
 
     public async Task UploadFilesAsync(
@@ -108,49 +116,61 @@ public class TransferClient
             token.ThrowIfCancellationRequested();
             var file = session.Files[i];
 
-            if (string.IsNullOrEmpty(file.LocalPath) || !File.Exists(file.LocalPath))
+            Stream sourceStream;
+            if (file.OpenStreamAsync != null)
+            {
+                sourceStream = await file.OpenStreamAsync();
+            }
+            else if (!string.IsNullOrEmpty(file.LocalPath) && File.Exists(file.LocalPath))
+            {
+                sourceStream = new FileStream(file.LocalPath, FileMode.Open, FileAccess.Read, FileShare.Read, 256 * 1024, FileOptions.Asynchronous | FileOptions.SequentialScan);
+            }
+            else
             {
                 throw new FileNotFoundException($"Die Datei wurde nicht gefunden: {file.FileName}");
             }
 
             var url = $"http://{target.IpAddress}:{target.Port}/api/transfer/upload?sessionId={session.SessionId}&fileId={file.Id}&token={session.SecurityToken}";
 
-            using var fileStream = new FileStream(file.LocalPath, FileMode.Open, FileAccess.Read, FileShare.Read, 256 * 1024, FileOptions.Asynchronous | FileOptions.SequentialScan);
-            var progressContent = new ProgressStreamContent(fileStream, 256 * 1024, (bytesSent, totalBytes) =>
+            using (sourceStream)
             {
-                file.BytesTransferred = bytesSent;
-                var currentOverall = totalUploadedOverall + bytesSent;
-
-                var now = sw.ElapsedMilliseconds;
-                if (now - lastSpeedTime >= 400)
+                var totalLength = file.FileSize > 0 ? file.FileSize : (sourceStream.CanSeek ? sourceStream.Length : -1);
+                var progressContent = new ProgressStreamContent(sourceStream, totalLength, 256 * 1024, (bytesSent, totalBytes) =>
                 {
-                    var deltaSec = (now - lastSpeedTime) / 1000.0;
-                    var speed = (currentOverall - lastSpeedBytes) / deltaSec;
-                    lastSpeedBytes = currentOverall;
-                    lastSpeedTime = now;
+                    file.BytesTransferred = bytesSent;
+                    var currentOverall = totalUploadedOverall + bytesSent;
 
-                    onProgress?.Invoke(new TransferProgress
+                    var now = sw.ElapsedMilliseconds;
+                    if (now - lastSpeedTime >= 400)
                     {
-                        SessionId = session.SessionId,
-                        CurrentFileName = file.FileName,
-                        CurrentFileIndex = i + 1,
-                        TotalFiles = session.Files.Count,
-                        CurrentFileBytesTransferred = bytesSent,
-                        CurrentFileTotalBytes = totalBytes,
-                        OverallBytesTransferred = currentOverall,
-                        TotalBytes = session.TotalBytes,
-                        SpeedBytesPerSec = speed
-                    });
-                }
-            });
+                        var deltaSec = (now - lastSpeedTime) / 1000.0;
+                        var speed = (currentOverall - lastSpeedBytes) / deltaSec;
+                        lastSpeedBytes = currentOverall;
+                        lastSpeedTime = now;
 
-            using var request = new HttpRequestMessage(HttpMethod.Post, url)
-            {
-                Content = progressContent
-            };
+                        onProgress?.Invoke(new TransferProgress
+                        {
+                            SessionId = session.SessionId,
+                            CurrentFileName = file.FileName,
+                            CurrentFileIndex = i + 1,
+                            TotalFiles = session.Files.Count,
+                            CurrentFileBytesTransferred = bytesSent,
+                            CurrentFileTotalBytes = totalBytes,
+                            OverallBytesTransferred = currentOverall,
+                            TotalBytes = session.TotalBytes,
+                            SpeedBytesPerSec = speed
+                        });
+                    }
+                });
 
-            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
-            response.EnsureSuccessStatusCode();
+                using var request = new HttpRequestMessage(HttpMethod.Post, url)
+                {
+                    Content = progressContent
+                };
+
+                var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
+                response.EnsureSuccessStatusCode();
+            }
 
             file.IsCompleted = true;
             totalUploadedOverall += file.FileSize;
@@ -291,16 +311,21 @@ public class TransferClient
 internal class ProgressStreamContent : HttpContent
 {
     private readonly Stream _stream;
+    private readonly long _contentLength;
     private readonly int _bufferSize;
     private readonly Action<long, long> _progressCallback;
 
-    public ProgressStreamContent(Stream stream, int bufferSize, Action<long, long> progressCallback)
+    public ProgressStreamContent(Stream stream, long contentLength, int bufferSize, Action<long, long> progressCallback)
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
+        _contentLength = contentLength > 0 ? contentLength : (stream.CanSeek ? stream.Length : -1);
         _bufferSize = bufferSize;
         _progressCallback = progressCallback ?? throw new ArgumentNullException(nameof(progressCallback));
         Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-        Headers.ContentLength = stream.Length;
+        if (_contentLength >= 0)
+        {
+            Headers.ContentLength = _contentLength;
+        }
     }
 
     protected override Task SerializeToStreamAsync(Stream targetStream, TransportContext? context)
@@ -312,11 +337,14 @@ internal class ProgressStreamContent : HttpContent
     {
         var buffer = ArrayPool<byte>.Shared.Rent(_bufferSize);
         long bytesSent = 0;
-        long totalLength = _stream.Length;
+        long totalLength = _contentLength;
 
         try
         {
-            _stream.Position = 0;
+            if (_stream.CanSeek)
+            {
+                _stream.Position = 0;
+            }
             int read;
             while ((read = await _stream.ReadAsync(buffer, cancellationToken)) > 0)
             {
@@ -333,7 +361,12 @@ internal class ProgressStreamContent : HttpContent
 
     protected override bool TryComputeLength(out long length)
     {
-        length = _stream.Length;
-        return true;
+        if (_contentLength >= 0)
+        {
+            length = _contentLength;
+            return true;
+        }
+        length = 0;
+        return false;
     }
 }

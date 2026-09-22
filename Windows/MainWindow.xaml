@@ -5,456 +5,582 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="AuraDrop"
-        Height="720" Width="1060"
-        MinHeight="640" MinWidth="900"
+        Height="730" Width="1080"
+        MinHeight="640" MinWidth="920"
         WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
         Background="{StaticResource BgPrimary}"
         Foreground="{StaticResource TextPrimary}"
         AllowDrop="True"
         Drop="Window_Drop"
         DragEnter="Window_DragEnter">
 
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="42" ResizeBorderThickness="6" GlassFrameThickness="0" CornerRadius="0" />
+    </WindowChrome.WindowChrome>
+
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <!-- Custom Seamless Dark Title Bar (Zero White Bars!) -->
+            <RowDefinition Height="42" />
+            <!-- Main Content Area -->
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-        <!-- ==================== LEFT SIDEBAR ==================== -->
-        <Border Grid.Column="0" Background="{StaticResource BgSecondary}" BorderBrush="{StaticResource BorderColor}" BorderThickness="0,0,1,0">
-            <Grid Margin="24,28,24,24">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+        <!-- ==================== TOP TITLE BAR ==================== -->
+        <Border Grid.Row="0" Background="{StaticResource BgSecondary}" BorderBrush="{StaticResource BorderColor}" BorderThickness="0,0,0,1" MouseDown="TitleBar_MouseDown">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-                <!-- App Name Header (Matching Image 1) -->
-                <StackPanel Grid.Row="0" Margin="0,0,0,32">
-                    <TextBlock Text="AuraDrop" FontSize="28" FontWeight="ExtraBold" Foreground="{StaticResource TextPrimary}" />
-                    <TextBlock Text="Local &amp; PIN Dateitransfer" FontSize="11" Foreground="{StaticResource AccentMint}" Margin="2,2,0,0" />
+                <!-- App Branding -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
+                    <!-- Glowing Aura Icon -->
+                    <Border Width="24" Height="24" CornerRadius="7" Background="{StaticResource AuraGradient}" Margin="0,0,10,0">
+                        <Path Data="{StaticResource GeoSend}" Stroke="#FFFFFF" StrokeThickness="1.5" Stretch="Uniform" Width="12" Height="12" Fill="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <TextBlock Text="AuraDrop" FontSize="15" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center" />
+                    <Border Background="#1E293B" CornerRadius="4" Padding="5,1" Margin="8,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="P2P" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentCyan}" />
+                    </Border>
                 </StackPanel>
 
-                <!-- Nav Tabs (Pills) -->
-                <StackPanel Grid.Row="1" VerticalAlignment="Top">
-                    <!-- Empfangen (Default active like Image 1) -->
-                    <RadioButton x:Name="TabBtnReceive" GroupName="NavTabs" IsChecked="True" Checked="TabBtn_Checked"
-                                 Style="{StaticResource NavPillButton}" Margin="0,0,0,8">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="📶" FontSize="16" Margin="0,0,12,0" VerticalAlignment="Center" />
-                            <TextBlock Text="Empfangen" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </RadioButton>
+                <!-- Draggable Middle Spacer -->
+                <Grid Grid.Column="1" Background="Transparent" />
 
-                    <!-- Senden -->
-                    <RadioButton x:Name="TabBtnSend" GroupName="NavTabs" Checked="TabBtn_Checked"
-                                 Style="{StaticResource NavPillButton}" Margin="0,0,0,8">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="✈️" FontSize="16" Margin="0,0,12,0" VerticalAlignment="Center" />
-                            <TextBlock Text="Senden" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </RadioButton>
+                <!-- Action Controls & Window Buttons -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" WindowChrome.IsHitTestVisibleInChrome="True">
+                    <!-- Top Action Icons: History & Info -->
+                    <Button Style="{StaticResource CaptionButton}" Width="38" Click="BtnOpenHistory_Click" ToolTip="Übertragungsverlauf">
+                        <Path Data="{StaticResource GeoHistory}" Stroke="{StaticResource TextSecondary}" StrokeThickness="1.8" Stretch="Uniform" Width="15" Height="15" Fill="Transparent" />
+                    </Button>
+                    <Button Style="{StaticResource CaptionButton}" Width="38" Click="BtnOpenInfo_Click" ToolTip="Über AuraDrop">
+                        <Path Data="{StaticResource GeoInfo}" Stroke="{StaticResource TextSecondary}" StrokeThickness="1.8" Stretch="Uniform" Width="15" Height="15" Fill="Transparent" />
+                    </Button>
 
-                    <!-- Einstellungen -->
-                    <RadioButton x:Name="TabBtnSettings" GroupName="NavTabs" Checked="TabBtn_Checked"
-                                 Style="{StaticResource NavPillButton}" Margin="0,0,0,8">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="⚙️" FontSize="16" Margin="0,0,12,0" VerticalAlignment="Center" />
-                            <TextBlock Text="Einstellungen" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </RadioButton>
+                    <Border Width="1" Height="18" Background="{StaticResource BorderColor}" Margin="4,0" VerticalAlignment="Center" />
+
+                    <!-- Native Window Control Buttons -->
+                    <Button Style="{StaticResource CaptionButton}" Click="BtnMinimize_Click" ToolTip="Minimieren">
+                        <Path Data="{StaticResource GeoMinimize}" Stroke="{StaticResource TextSecondary}" StrokeThickness="1.5" Stretch="Uniform" Width="10" Height="2" />
+                    </Button>
+                    <Button Style="{StaticResource CaptionButton}" Click="BtnMaximize_Click" ToolTip="Maximieren">
+                        <Path Data="{StaticResource GeoMaximize}" Stroke="{StaticResource TextSecondary}" StrokeThickness="1.5" Stretch="Uniform" Width="10" Height="10" Fill="Transparent" />
+                    </Button>
+                    <Button Style="{StaticResource CaptionCloseButton}" Click="BtnClose_Click" ToolTip="Schließen">
+                        <Path Data="{StaticResource GeoClose}" Stroke="{StaticResource TextSecondary}" StrokeThickness="1.8" Stretch="Uniform" Width="11" Height="11" />
+                    </Button>
                 </StackPanel>
-
-                <!-- Bottom IP / Port Badge -->
-                <Border Grid.Row="2" Background="{StaticResource BgCard}" CornerRadius="12" Padding="12" BorderBrush="{StaticResource BorderColor}" BorderThickness="1">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                            <Ellipse Width="8" Height="8" Fill="{StaticResource AccentMint}" Margin="0,0,8,0" VerticalAlignment="Center" />
-                            <TextBlock x:Name="TxtLocalDeviceName" Text="Efficient Lemon" FontSize="13" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" />
-                        </StackPanel>
-                        <TextBlock x:Name="TxtLocalIp" Text="IP: 192.168.0.190" FontSize="11" Foreground="{StaticResource TextMuted}" />
-                    </StackPanel>
-                </Border>
             </Grid>
         </Border>
 
-        <!-- ==================== MAIN CONTENT ==================== -->
-        <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
+        <!-- ==================== BODY (SIDEBAR + MAIN PANES) ==================== -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="240" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-            <!-- Top Right Action Icons (Matching Image 1: History 🕒, Info ℹ️) -->
-            <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,24,0">
-                <Button Style="{StaticResource SubtleButton}" Padding="10,6" Margin="0,0,8,0" Click="BtnOpenHistory_Click" ToolTip="Verlauf anzeigen">
-                    <TextBlock Text="🕒" FontSize="16" />
-                </Button>
-                <Button Style="{StaticResource SubtleButton}" Padding="10,6" Click="BtnOpenInfo_Click" ToolTip="Über AuraDrop">
-                    <TextBlock Text="ℹ️" FontSize="16" />
-                </Button>
-            </StackPanel>
-
-            <!-- ==================== VIEW 1: EMPFANGEN (Matching Image 1) ==================== -->
-            <Grid x:Name="ViewReceive" Grid.Row="1" Visibility="Visible" Margin="40,10,40,30">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-
-                <!-- Center Segmented Emblem + Device Alias -->
-                <StackPanel Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <!-- Segmented Radar Circle Logo -->
-                    <Viewbox Width="150" Height="150" HorizontalAlignment="Center" Margin="0,0,0,24">
-                        <Canvas Width="150" Height="150">
-                            <!-- Center Solid Core Circle -->
-                            <Ellipse Canvas.Left="42" Canvas.Top="42" Width="66" Height="66" Fill="{StaticResource AccentMint}" />
-
-                            <!-- 6 Curved Orbital Segment Dashes -->
-                            <!-- Segment 1: Top -->
-                            <Path Stroke="{StaticResource AccentMint}" StrokeThickness="11" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                                  Data="M 52,14 A 62,62 0 0,1 98,14" />
-                            <!-- Segment 2: Top Right -->
-                            <Path Stroke="{StaticResource AccentMint}" StrokeThickness="11" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                                  Data="M 124,38 A 62,62 0 0,1 138,75" />
-                            <!-- Segment 3: Bottom Right -->
-                            <Path Stroke="{StaticResource AccentMint}" StrokeThickness="11" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                                  Data="M 134,98 A 62,62 0 0,1 106,132" />
-                            <!-- Segment 4: Bottom -->
-                            <Path Stroke="{StaticResource AccentMint}" StrokeThickness="11" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                                  Data="M 88,138 A 62,62 0 0,1 52,134" />
-                            <!-- Segment 5: Bottom Left -->
-                            <Path Stroke="{StaticResource AccentMint}" StrokeThickness="11" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                                  Data="M 24,116 A 62,62 0 0,1 12,75" />
-                            <!-- Segment 6: Top Left -->
-                            <Path Stroke="{StaticResource AccentMint}" StrokeThickness="11" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                                  Data="M 18,52 A 62,62 0 0,1 38,28" />
-                        </Canvas>
-                    </Viewbox>
-
-                    <!-- Device Name -->
-                    <TextBlock x:Name="TxtCenterDeviceName" Text="Efficient Lemon" FontSize="36" FontWeight="SemiBold" HorizontalAlignment="Center" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,4" />
-
-                    <!-- Device Hash / Suffix Badge (e.g. #190) -->
-                    <TextBlock x:Name="TxtCenterDeviceHash" Text="#190" FontSize="20" FontWeight="Normal" HorizontalAlignment="Center" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,24" />
-
-                    <!-- Quick Save Selector (Matching Image 1: [ Aus | Favoriten | An ]) -->
-                    <StackPanel HorizontalAlignment="Center" Margin="0,0,0,16">
-                        <TextBlock Text="Quick Save" FontSize="12" Foreground="{StaticResource TextSecondary}" HorizontalAlignment="Center" Margin="0,0,0,8" />
-                        <Border Background="#14211E" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="18" Padding="2">
-                            <StackPanel Orientation="Horizontal">
-                                <Button x:Name="BtnQuickSaveOff" Content="Aus" Style="{StaticResource SubtleButton}" Padding="16,6" Margin="1" BorderThickness="0" Background="Transparent" Foreground="{StaticResource TextPrimary}" Click="BtnQuickSave_Click" Tag="Off" />
-                                <Border Width="1" Background="{StaticResource BorderColor}" Margin="0,4" />
-                                <Button x:Name="BtnQuickSaveFav" Content="Favoriten" Style="{StaticResource SubtleButton}" Padding="16,6" Margin="1" BorderThickness="0" Background="Transparent" Foreground="{StaticResource TextSecondary}" Click="BtnQuickSave_Click" Tag="Fav" />
-                                <Border Width="1" Background="{StaticResource BorderColor}" Margin="0,4" />
-                                <Button x:Name="BtnQuickSaveOn" Content="An" Style="{StaticResource SubtleButton}" Padding="16,6" Margin="1" BorderThickness="0" Background="{StaticResource PillActive}" Foreground="{StaticResource AccentMint}" FontWeight="Bold" Click="BtnQuickSave_Click" Tag="On" />
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
-                </StackPanel>
-
-                <!-- Bottom Bar: Send Anywhere PIN Input (Pull files from another device) -->
-                <Border Grid.Row="1" Background="{StaticResource BgCard}" CornerRadius="14" Padding="16,12" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" MaxWidth="520" Margin="0,0,0,12">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="🔑 PIN abholen:" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,12,0" />
-                        <TextBox Grid.Column="1" x:Name="TxtInputPin" Style="{StaticResource ModernTextBox}" FontSize="16" FontWeight="Bold" TextAlignment="Center" MaxLength="7" Text="123 456" Margin="0,0,10,0" />
-                        <Button Grid.Column="2" Content="Abholen" Style="{StaticResource MintButton}" Click="BtnFetchViaPin_Click" />
-                    </Grid>
-                </Border>
-
-                <!-- Download Directory Info -->
-                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
-                    <TextBlock Text="Dateien werden gespeichert in: " FontSize="11" Foreground="{StaticResource TextMuted}" />
-                    <TextBlock x:Name="TxtReceiveFolder" Text="Downloads\AuraDrop" FontSize="11" Foreground="{StaticResource AccentMint}" FontWeight="SemiBold" Cursor="Hand" MouseDown="TxtReceiveFolder_MouseDown" />
-                </StackPanel>
-            </Grid>
-
-            <!-- ==================== VIEW 2: SENDEN (Matching Images 2 & 3) ==================== -->
-            <Grid x:Name="ViewSend" Grid.Row="1" Visibility="Collapsed" Margin="32,10,32,24">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-
-                <!-- Section: Selection (4 Cards in a row: Media, Text, File, Folder + PIN) -->
-                <StackPanel Grid.Row="0" Margin="0,0,0,18">
-                    <TextBlock Text="Selection" FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,10" />
-                    <UniformGrid Columns="5">
-                        <!-- Media Card -->
-                        <Button Style="{StaticResource ActionCardButton}" Margin="0,0,8,0" Click="BtnPickMedia_Click">
-                            <StackPanel HorizontalAlignment="Center">
-                                <TextBlock Text="🖼️" FontSize="22" HorizontalAlignment="Center" Margin="0,0,0,6" />
-                                <TextBlock Text="Media" FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Center" />
-                            </StackPanel>
-                        </Button>
-
-                        <!-- Text Card -->
-                        <Button Style="{StaticResource ActionCardButton}" Margin="0,0,8,0" Click="BtnSendText_Click">
-                            <StackPanel HorizontalAlignment="Center">
-                                <TextBlock Text="📝" FontSize="22" HorizontalAlignment="Center" Margin="0,0,0,6" />
-                                <TextBlock Text="Text" FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Center" />
-                            </StackPanel>
-                        </Button>
-
-                        <!-- File Card -->
-                        <Button Style="{StaticResource ActionCardButton}" Margin="0,0,8,0" Click="BtnPickFiles_Click">
-                            <StackPanel HorizontalAlignment="Center">
-                                <TextBlock Text="📄" FontSize="22" HorizontalAlignment="Center" Margin="0,0,0,6" />
-                                <TextBlock Text="File" FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Center" />
-                            </StackPanel>
-                        </Button>
-
-                        <!-- Folder Card -->
-                        <Button Style="{StaticResource ActionCardButton}" Margin="0,0,8,0" Click="BtnPickFolder_Click">
-                            <StackPanel HorizontalAlignment="Center">
-                                <TextBlock Text="📁" FontSize="22" HorizontalAlignment="Center" Margin="0,0,0,6" />
-                                <TextBlock Text="Folder" FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Center" />
-                            </StackPanel>
-                        </Button>
-
-                        <!-- PIN Code Card (Send Anywhere) -->
-                        <Button Style="{StaticResource ActionCardButton}" Click="BtnGeneratePin_Click">
-                            <StackPanel HorizontalAlignment="Center">
-                                <TextBlock Text="🔑" FontSize="22" HorizontalAlignment="Center" Margin="0,0,0,6" />
-                                <TextBlock Text="PIN Code" FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Center" />
-                            </StackPanel>
-                        </Button>
-                    </UniformGrid>
-                </StackPanel>
-
-                <!-- Selected Files Banner (Shows if files are chosen) -->
-                <Border x:Name="BorderSelectedFiles" Grid.Row="1" Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="12" Padding="14,10" Margin="0,0,0,18" Visibility="Collapsed">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="📦" FontSize="18" Margin="0,0,8,0" VerticalAlignment="Center" />
-                            <TextBlock x:Name="TxtSelectedFilesSummary" Text="3 Dateien ausgewählt (45 MB)" FontWeight="Bold" FontSize="13" VerticalAlignment="Center" />
-                        </StackPanel>
-                        <StackPanel Grid.Column="1" Orientation="Horizontal">
-                            <Button Content="Dateien ansehen" Style="{StaticResource SubtleButton}" Margin="0,0,8,0" Click="BtnToggleFileList_Click" />
-                            <Button Content="Leeren" Style="{StaticResource SubtleButton}" Foreground="{StaticResource AccentRed}" Click="BtnClearFiles_Click" />
-                        </StackPanel>
-                    </Grid>
-                </Border>
-
-                <!-- Section: Nearby Devices -->
-                <Grid Grid.Row="2">
+            <!-- ==================== LEFT SIDEBAR ==================== -->
+            <Border Grid.Column="0" Background="{StaticResource BgSecondary}" BorderBrush="{StaticResource BorderColor}" BorderThickness="0,0,1,0">
+                <Grid Margin="18,22,18,20">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <DockPanel Grid.Row="0" Margin="0,0,0,12">
-                        <TextBlock Text="Nearby devices" FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" />
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                            <Button Style="{StaticResource SubtleButton}" Padding="8,4" Margin="0,0,6,0" Click="BtnRefreshDevices_Click" ToolTip="Erneut suchen">
-                                <TextBlock Text="🔄" FontSize="13" />
-                            </Button>
-                            <Button Style="{StaticResource SubtleButton}" Padding="8,4" Click="BtnDirectIpDialog_Click" ToolTip="Direkte IP-Adresse eingeben">
-                                <TextBlock Text="🎯" FontSize="13" />
-                            </Button>
-                        </StackPanel>
-                    </DockPanel>
-
-                    <!-- Device Cards List (Matching Image 2/3) -->
-                    <ListBox x:Name="ListNearbyDevices" Grid.Row="1" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Border Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="14" Padding="14,12" Margin="0,0,0,10">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="46" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-
-                                        <!-- Device Icon (Laptop or Phone) -->
-                                        <Border Grid.Column="0" Width="38" Height="38" Background="#14211E" CornerRadius="10" HorizontalAlignment="Left">
-                                            <TextBlock Text="{Binding DisplayIcon}" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                        </Border>
-
-                                        <!-- Name & Badges -->
-                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
-                                            <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" />
-                                            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
-                                                <!-- IP Hash Badge (e.g. #75) -->
-                                                <Border Background="#14211E" CornerRadius="4" Padding="6,2" Margin="0,0,6,0">
-                                                    <TextBlock Text="{Binding Port, StringFormat='#{0}'}" FontSize="11" Foreground="{StaticResource TextSecondary}" />
-                                                </Border>
-                                                <!-- OS Badge (e.g. Windows / Android) -->
-                                                <Border Background="#14211E" CornerRadius="4" Padding="6,2">
-                                                    <TextBlock Text="{Binding DeviceType}" FontSize="11" Foreground="{StaticResource AccentMint}" FontWeight="SemiBold" />
-                                                </Border>
-                                            </StackPanel>
-                                        </StackPanel>
-
-                                        <!-- Send Button & Heart -->
-                                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                                            <Button Content="Senden" Style="{StaticResource MintButton}" Click="BtnSendToDevice_Click" Tag="{Binding}" Margin="0,0,8,0" />
-                                            <Button Content="🤍" Style="{StaticResource SubtleButton}" Padding="8,6" />
-                                        </StackPanel>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-
-                    <!-- Empty State -->
-                    <StackPanel x:Name="PanelNoDevicesNearby" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <TextBlock Text="📡" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,8" />
-                        <TextBlock Text="Suche nach Geräten im selben WLAN..." FontSize="13" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center" />
-                        <TextBlock Text="Stelle sicher, dass beide Geräte im selben WLAN sind." FontSize="11" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center" Margin="0,4,0,0" />
+                    <!-- Sidebar Header / Tagline -->
+                    <StackPanel Grid.Row="0" Margin="4,0,0,24">
+                        <TextBlock Text="DATENTRANSFER" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMuted}" Margin="0,0,0,2" />
+                        <TextBlock Text="Direkt &amp; unkomprimiert" FontSize="12" Foreground="{StaticResource AccentCyan}" />
                     </StackPanel>
 
-                    <!-- Troubleshoot Hint (Matching Image 3) -->
-                    <StackPanel Grid.Row="2" HorizontalAlignment="Center" Margin="0,8,0,0">
-                        <TextBlock Text="Troubleshoot" FontSize="12" Foreground="{StaticResource AccentMint}" FontWeight="SemiBold" HorizontalAlignment="Center" Cursor="Hand" Margin="0,0,0,2" />
-                        <TextBlock Text="Bitte stelle sicher, dass sich das Zielgerät im selben WLAN-Netzwerk befindet." FontSize="11" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center" />
+                    <!-- Nav Tabs (Pills) -->
+                    <StackPanel Grid.Row="1" VerticalAlignment="Top">
+                        <!-- Empfangen Tab -->
+                        <RadioButton x:Name="TabBtnReceive" GroupName="NavTabs" IsChecked="True" Checked="TabBtn_Checked"
+                                     Style="{StaticResource NavPillButton}" Margin="0,0,0,6">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="{StaticResource GeoReceive}" Stroke="{Binding RelativeSource={RelativeSource AncestorType=RadioButton}, Path=Foreground}" StrokeThickness="1.8" Stretch="Uniform" Width="16" Height="16" Fill="Transparent" Margin="0,0,12,0" VerticalAlignment="Center" />
+                                <TextBlock Text="Empfangen" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </RadioButton>
+
+                        <!-- Senden Tab -->
+                        <RadioButton x:Name="TabBtnSend" GroupName="NavTabs" Checked="TabBtn_Checked"
+                                     Style="{StaticResource NavPillButton}" Margin="0,0,0,6">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="{StaticResource GeoSend}" Stroke="{Binding RelativeSource={RelativeSource AncestorType=RadioButton}, Path=Foreground}" StrokeThickness="1.8" Stretch="Uniform" Width="16" Height="16" Fill="Transparent" Margin="0,0,12,0" VerticalAlignment="Center" />
+                                <TextBlock Text="Senden" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </RadioButton>
+
+                        <!-- Einstellungen Tab -->
+                        <RadioButton x:Name="TabBtnSettings" GroupName="NavTabs" Checked="TabBtn_Checked"
+                                     Style="{StaticResource NavPillButton}" Margin="0,0,0,6">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="{StaticResource GeoSettings}" Stroke="{Binding RelativeSource={RelativeSource AncestorType=RadioButton}, Path=Foreground}" StrokeThickness="1.8" Stretch="Uniform" Width="16" Height="16" Fill="Transparent" Margin="0,0,12,0" VerticalAlignment="Center" />
+                                <TextBlock Text="Einstellungen" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </RadioButton>
+                    </StackPanel>
+
+                    <!-- Local Device Badge -->
+                    <Border Grid.Row="2" Background="{StaticResource BgCard}" CornerRadius="12" Padding="12" BorderBrush="{StaticResource BorderColor}" BorderThickness="1">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <Ellipse Width="8" Height="8" Fill="{StaticResource AccentCyan}" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                <TextBlock x:Name="TxtLocalDeviceName" Text="Mein PC" FontSize="13" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" />
+                            </StackPanel>
+                            <TextBlock x:Name="TxtLocalIp" Text="IP: 192.168.0.x" FontSize="11" Foreground="{StaticResource TextMuted}" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- ==================== MAIN CONTENT ==================== -->
+            <Grid Grid.Column="1">
+
+                <!-- ==================== VIEW 1: EMPFANGEN ==================== -->
+                <Grid x:Name="ViewReceive" Visibility="Visible" Margin="40,24,40,28">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Center Orbital Beacon Visual -->
+                    <StackPanel Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <!-- High-Tech Neon Aura Centerpiece -->
+                        <Viewbox Width="170" Height="170" HorizontalAlignment="Center" Margin="0,0,0,26">
+                            <Canvas Width="170" Height="170">
+                                <!-- Outer Pulse Aura Ring 1 -->
+                                <Ellipse Canvas.Left="10" Canvas.Top="10" Width="150" Height="150" Stroke="#1E2E4A" StrokeThickness="1.5" StrokeDashArray="4 4" />
+                                <!-- Outer Pulse Aura Ring 2 -->
+                                <Ellipse Canvas.Left="26" Canvas.Top="26" Width="118" Height="118" Stroke="#2A3D63" StrokeThickness="2" />
+                                
+                                <!-- Curved Orbital Segment Glows -->
+                                <Path Stroke="{StaticResource AccentCyan}" StrokeThickness="6" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                      Data="M 40,32 A 60,60 0 0,1 130,32" />
+                                <Path Stroke="{StaticResource AccentIndigo}" StrokeThickness="6" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                      Data="M 148,85 A 60,60 0 0,1 125,138" />
+                                <Path Stroke="{StaticResource AccentCyan}" StrokeThickness="6" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                      Data="M 45,138 A 60,60 0 0,1 22,85" />
+
+                                <!-- Glowing Core Circle -->
+                                <Ellipse Canvas.Left="55" Canvas.Top="55" Width="60" Height="60" Fill="{StaticResource AuraGradient}" />
+                                
+                                <!-- Core Icon -->
+                                <Path Canvas.Left="73" Canvas.Top="72" Data="{StaticResource GeoReceive}" Stroke="#FFFFFF" StrokeThickness="2.2" Stretch="Uniform" Width="24" Height="24" Fill="Transparent" />
+                            </Canvas>
+                        </Viewbox>
+
+                        <!-- Device Alias -->
+                        <TextBlock x:Name="TxtCenterDeviceName" Text="Mein PC" FontSize="32" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,4" />
+
+                        <!-- Device Network Hash / ID -->
+                        <TextBlock x:Name="TxtCenterDeviceHash" Text="#190" FontSize="18" HorizontalAlignment="Center" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,24" />
+
+                        <!-- Quick Save Mode Selector -->
+                        <StackPanel HorizontalAlignment="Center" Margin="0,0,0,20">
+                            <TextBlock Text="Automatisches Empfangen (Quick Save)" FontSize="12" Foreground="{StaticResource TextSecondary}" HorizontalAlignment="Center" Margin="0,0,0,8" />
+                            <Border Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="12" Padding="3">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button x:Name="BtnQuickSaveOff" Content="Aus (Bestätigen)" Style="{StaticResource SubtleButton}" Padding="16,6" Margin="1" BorderThickness="0" Background="Transparent" Foreground="{StaticResource TextSecondary}" Click="BtnQuickSave_Click" Tag="Off" />
+                                    <Border Width="1" Background="{StaticResource BorderColor}" Margin="0,4" />
+                                    <Button x:Name="BtnQuickSaveOn" Content="An (Sofort speichern)" Style="{StaticResource SubtleButton}" Padding="16,6" Margin="1" BorderThickness="0" Background="#1E293B" Foreground="{StaticResource AccentCyan}" FontWeight="Bold" Click="BtnQuickSave_Click" Tag="On" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- Subtle PIN Fetch Action Link (Clean & Non-Intrusive) -->
+                        <Button Style="{StaticResource SubtleButton}" HorizontalAlignment="Center" Padding="14,6" Margin="0,0,0,10" Click="BtnOpenFetchPinDialog_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="{StaticResource GeoShieldKey}" Stroke="{StaticResource AccentCyan}" StrokeThickness="1.5" Stretch="Uniform" Width="14" Height="14" Fill="Transparent" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                <TextBlock Text="Übertragung per 6-stelligem PIN abholen..." FontSize="12" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+
+                    <!-- Download Directory Link -->
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                        <TextBlock Text="Speicherort für empfangene Dateien: " FontSize="12" Foreground="{StaticResource TextMuted}" />
+                        <TextBlock x:Name="TxtReceiveFolder" Text="Downloads\AuraDrop" FontSize="12" Foreground="{StaticResource AccentCyan}" FontWeight="SemiBold" Cursor="Hand" MouseDown="TxtReceiveFolder_MouseDown" />
                     </StackPanel>
                 </Grid>
-            </Grid>
 
-            <!-- ==================== VIEW 3: EINSTELLUNGEN ==================== -->
-            <Grid x:Name="ViewSettings" Grid.Row="1" Visibility="Collapsed" Margin="32,20,32,24">
-                <Border Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="16" Padding="26" MaxWidth="640" HorizontalAlignment="Left">
-                    <StackPanel>
-                        <TextBlock Text="Einstellungen" FontSize="20" FontWeight="Bold" Margin="0,0,0,16" />
+                <!-- ==================== VIEW 2: SENDEN ==================== -->
+                <Grid x:Name="ViewSend" Visibility="Collapsed" Margin="32,20,32,24">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
 
-                        <!-- Device Name -->
-                        <TextBlock Text="Gerätename (Alias)" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,6" />
-                        <Grid Margin="0,0,0,18">
+                    <!-- Selection Buttons: Media, Text, File, Folder, PIN -->
+                    <StackPanel Grid.Row="0" Margin="0,0,0,18">
+                        <TextBlock Text="DATEIEN ZUM SENDEN WÄHLEN" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMuted}" Margin="0,0,0,10" />
+                        <UniformGrid Columns="5">
+                            <!-- Media Card -->
+                            <Button Style="{StaticResource ActionCardButton}" Margin="0,0,8,0" Click="BtnPickMedia_Click">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <Path Data="{StaticResource GeoMedia}" Stroke="{StaticResource AccentCyan}" StrokeThickness="1.8" Stretch="Uniform" Width="22" Height="22" Fill="Transparent" HorizontalAlignment="Center" Margin="0,0,0,8" />
+                                    <TextBlock Text="Medien" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Text Card -->
+                            <Button Style="{StaticResource ActionCardButton}" Margin="0,0,8,0" Click="BtnSendText_Click">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <Path Data="{StaticResource GeoText}" Stroke="{StaticResource AccentIndigo}" StrokeThickness="1.8" Stretch="Uniform" Width="22" Height="22" Fill="Transparent" HorizontalAlignment="Center" Margin="0,0,0,8" />
+                                    <TextBlock Text="Text / Notiz" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+
+                            <!-- File Card -->
+                            <Button Style="{StaticResource ActionCardButton}" Margin="0,0,8,0" Click="BtnPickFiles_Click">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <Path Data="{StaticResource GeoFile}" Stroke="{StaticResource AccentCyan}" StrokeThickness="1.8" Stretch="Uniform" Width="22" Height="22" Fill="Transparent" HorizontalAlignment="Center" Margin="0,0,0,8" />
+                                    <TextBlock Text="Dateien" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Folder Card -->
+                            <Button Style="{StaticResource ActionCardButton}" Margin="0,0,8,0" Click="BtnPickFolder_Click">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <Path Data="{StaticResource GeoFolder}" Stroke="{StaticResource AccentIndigo}" StrokeThickness="1.8" Stretch="Uniform" Width="22" Height="22" Fill="Transparent" HorizontalAlignment="Center" Margin="0,0,0,8" />
+                                    <TextBlock Text="Ordner" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+
+                            <!-- PIN Code (One-time transfer session) -->
+                            <Button Style="{StaticResource ActionCardButton}" Click="BtnGeneratePin_Click">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <Path Data="{StaticResource GeoShieldKey}" Stroke="{StaticResource AccentCyan}" StrokeThickness="1.8" Stretch="Uniform" Width="22" Height="22" Fill="Transparent" HorizontalAlignment="Center" Margin="0,0,0,8" />
+                                    <TextBlock Text="PIN Code" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </UniformGrid>
+                    </StackPanel>
+
+                    <!-- Selected Files Banner -->
+                    <Border x:Name="BorderSelectedFiles" Grid.Row="1" Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderGlowColor}" BorderThickness="1" CornerRadius="12" Padding="14,10" Margin="0,0,0,18" Visibility="Collapsed">
+                        <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <TextBox x:Name="TxtSettingsDeviceName" Style="{StaticResource ModernTextBox}" Margin="0,0,8,0" />
-                            <Button Grid.Column="1" Content="Speichern" Style="{StaticResource MintButton}" Click="BtnSaveDeviceName_Click" />
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Border Width="28" Height="28" Background="#1E293B" CornerRadius="8" Margin="0,0,10,0">
+                                    <Path Data="{StaticResource GeoCheck}" Stroke="{StaticResource AccentCyan}" StrokeThickness="2" Stretch="Uniform" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <TextBlock x:Name="TxtSelectedFilesSummary" Text="3 Datei(en) ausgewählt (45 MB)" FontWeight="Bold" FontSize="13" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <Button Content="Details anzeigen" Style="{StaticResource SubtleButton}" Margin="0,0,8,0" Click="BtnToggleFileList_Click" />
+                                <Button Content="Auswahl leeren" Style="{StaticResource SubtleButton}" Foreground="{StaticResource AccentRed}" Click="BtnClearFiles_Click" />
+                            </StackPanel>
                         </Grid>
+                    </Border>
 
-                        <Separator Background="{StaticResource BorderColor}" Margin="0,0,0,18" />
-
-                        <!-- Download Folder -->
-                        <TextBlock Text="Download-Ordner" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,6" />
-                        <Grid Margin="0,0,0,18">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <TextBox x:Name="TxtSettingsDownloadFolder" Style="{StaticResource ModernTextBox}" IsReadOnly="True" Margin="0,0,8,0" />
-                            <Button Grid.Column="1" Content="Ändern" Style="{StaticResource SubtleButton}" Click="BtnBrowseDownloadFolder_Click" />
-                        </Grid>
-
-                        <Separator Background="{StaticResource BorderColor}" Margin="0,0,0,18" />
-
-                        <!-- Network Details -->
-                        <TextBlock Text="Netzwerk-Status" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,6" />
-                        <TextBlock x:Name="TxtSettingsNetwork" Text="IP: 192.168.0.190 | Port: 52525" FontSize="12" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,4" />
-                        <TextBlock Text="✅ Lokales P2P-Protokoll aktiv (Kein Server, maximale Geschwindigkeit)" FontSize="11" Foreground="{StaticResource AccentMint}" />
-                    </StackPanel>
-                </Border>
-            </Grid>
-
-            <!-- ==================== OVERLAY: SEND ANYWHERE PIN POPUP ==================== -->
-            <Border x:Name="BorderPinDisplay" Grid.Row="0" Grid.RowSpan="2" Background="#D9000000" Visibility="Collapsed" Panel.ZIndex="100">
-                <Border Width="380" Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="18" Padding="26" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="🔑 Send Anywhere PIN" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,8" />
-                        <TextBlock Text="Gib diesen 6-stelligen Code auf dem Zielgerät ein:" FontSize="12" Foreground="{StaticResource TextSecondary}" TextAlignment="Center" Margin="0,0,0,18" />
-                        <Border Background="#121D1A" BorderBrush="{StaticResource AccentMint}" BorderThickness="2" CornerRadius="14" Padding="20,12" Margin="0,0,0,18">
-                            <TextBlock x:Name="TxtGeneratedPin" Text="000 000" FontSize="36" FontWeight="Bold" Foreground="{StaticResource AccentMint}" HorizontalAlignment="Center" />
-                        </Border>
-                        <TextBlock Text="Warte auf Download durch Empfänger..." FontSize="11" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center" Margin="0,0,0,16" />
-                        <Button Content="Fertig / Schließen" Style="{StaticResource MintButton}" Click="BtnClosePinOverlay_Click" Width="160" />
-                    </StackPanel>
-                </Border>
-            </Border>
-
-            <!-- ==================== OVERLAY: LIVE TRANSFER PROGRESS ==================== -->
-            <Border x:Name="BorderLiveProgress" Grid.Row="0" Grid.RowSpan="2" Background="#EE101A18" Visibility="Collapsed" Panel.ZIndex="110">
-                <Border Width="440" Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="18" Padding="26" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <StackPanel>
-                        <TextBlock x:Name="TxtProgressTitle" Text="Dateien werden übertragen..." FontSize="18" FontWeight="Bold" Margin="0,0,0,6" />
-                        <TextBlock x:Name="TxtProgressFileName" Text="Datei: 1/5" FontSize="12" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,14" TextTrimming="CharacterEllipsis" />
-                        <ProgressBar x:Name="ProgressBarTransfer" Height="8" Value="0" Maximum="100" Margin="0,0,0,12" Foreground="{StaticResource AccentMint}" Background="#121D1A" />
-                        <Grid Margin="0,0,0,18">
-                            <TextBlock x:Name="TxtProgressPercent" Text="0%" FontWeight="Bold" FontSize="14" />
-                            <TextBlock x:Name="TxtProgressSpeed" Text="0 MB/s" Foreground="{StaticResource AccentMint}" HorizontalAlignment="Center" FontWeight="SemiBold" />
-                            <TextBlock x:Name="TxtProgressEta" Text="ETA: --:--" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Right" />
-                        </Grid>
-                        <Button Content="Abbrechen" Style="{StaticResource SubtleButton}" Foreground="{StaticResource AccentRed}" HorizontalAlignment="Right" Click="BtnCancelTransfer_Click" />
-                    </StackPanel>
-                </Border>
-            </Border>
-
-            <!-- ==================== OVERLAY: INCOMING TRANSFER CONFIRMATION ==================== -->
-            <Border x:Name="BorderIncomingPrompt" Grid.Row="0" Grid.RowSpan="2" Background="#E6000000" Visibility="Collapsed" Panel.ZIndex="120">
-                <Border Width="420" Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="18" Padding="24" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <StackPanel>
-                        <TextBlock Text="📥 Eingehende Dateiübertragung" FontSize="18" FontWeight="Bold" Margin="0,0,0,8" />
-                        <TextBlock x:Name="TxtIncomingPromptMessage" Text="Gerät möchte Dateien senden." FontSize="13" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,20" TextWrapping="Wrap" />
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                            <Button Content="Ablehnen" Style="{StaticResource SubtleButton}" Foreground="{StaticResource AccentRed}" Margin="0,0,10,0" Click="BtnRejectIncoming_Click" />
-                            <Button Content="Akzeptieren" Style="{StaticResource MintButton}" Click="BtnAcceptIncoming_Click" />
-                        </StackPanel>
-                    </StackPanel>
-                </Border>
-            </Border>
-
-            <!-- ==================== OVERLAY: HISTORY MODAL ==================== -->
-            <Border x:Name="BorderHistoryModal" Grid.Row="0" Grid.RowSpan="2" Background="#E6000000" Visibility="Collapsed" Panel.ZIndex="130">
-                <Border Width="620" Height="500" Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="18" Padding="24">
-                    <Grid>
+                    <!-- Nearby Devices Section -->
+                    <Grid Grid.Row="2">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        <DockPanel Grid.Row="0" Margin="0,0,0,14">
-                            <TextBlock Text="Übertragungsverlauf" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
-                            <Button Content="✕" Style="{StaticResource SubtleButton}" Padding="8,4" HorizontalAlignment="Right" Click="BtnCloseHistory_Click" />
+
+                        <DockPanel Grid.Row="0" Margin="0,0,0,12">
+                            <TextBlock Text="GERÄTE IM WLAN-NETZWERK" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" />
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Style="{StaticResource SubtleButton}" Padding="8,5" Margin="0,0,6,0" Click="BtnRefreshDevices_Click" ToolTip="Netzwerk neu scannen">
+                                    <Path Data="{StaticResource GeoRefresh}" Stroke="{StaticResource TextSecondary}" StrokeThickness="1.6" Stretch="Uniform" Width="14" Height="14" Fill="Transparent" />
+                                </Button>
+                                <Button Style="{StaticResource SubtleButton}" Padding="8,5" Click="BtnDirectIpDialog_Click" ToolTip="Direkte IP eingeben">
+                                    <Path Data="{StaticResource GeoDirectIp}" Stroke="{StaticResource TextSecondary}" StrokeThickness="1.6" Stretch="Uniform" Width="14" Height="14" Fill="Transparent" />
+                                </Button>
+                            </StackPanel>
                         </DockPanel>
-                        <ListBox x:Name="ListHistory" Grid.Row="1" Background="Transparent" BorderThickness="0">
+
+                        <!-- Device Cards List -->
+                        <ListBox x:Name="ListNearbyDevices" Grid.Row="1" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Background="#14211E" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,0,0,8">
+                                    <Border Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="14" Padding="14,12" Margin="0,0,0,8">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="32" />
+                                                <ColumnDefinition Width="46" />
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Grid.Column="0" Text="{Binding DirectionIcon}" FontSize="18" VerticalAlignment="Center" />
-                                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="6,0,10,0">
-                                                <TextBlock Text="{Binding SummaryText}" FontWeight="Bold" FontSize="13" />
-                                                <TextBlock Text="{Binding Timestamp, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}" FontSize="11" Foreground="{StaticResource TextMuted}" />
+
+                                            <!-- Vector Icon: Computer or Phone -->
+                                            <Border Grid.Column="0" Width="40" Height="40" Background="#152033" CornerRadius="10" HorizontalAlignment="Left">
+                                                <Path Stroke="{StaticResource AccentCyan}" StrokeThickness="1.8" Stretch="Uniform" Width="20" Height="20" Fill="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                    <Path.Style>
+                                                        <Style TargetType="Path">
+                                                            <Setter Property="Data" Value="{StaticResource GeoComputer}" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding DeviceType}" Value="Android">
+                                                                    <Setter Property="Data" Value="{StaticResource GeoSmartphone}" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Path.Style>
+                                                </Path>
+                                            </Border>
+
+                                            <!-- Name & Badges -->
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,0,0">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" />
+                                                    <!-- PIN Locked Indicator Badge -->
+                                                    <Border Background="#251E4E" CornerRadius="4" Padding="4,1" Margin="8,0,0,0" VerticalAlignment="Center" Visibility="{Binding PinRequired, Converter={x:Null}}">
+                                                        <Path Data="{StaticResource GeoShieldKey}" Stroke="{StaticResource AccentIndigo}" StrokeThickness="1.5" Stretch="Uniform" Width="10" Height="10" Fill="Transparent" ToolTip="Dieses Gerät erfordert einen PIN" />
+                                                    </Border>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                                                    <TextBlock Text="{Binding IpAddress}" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,0,8,0" />
+                                                    <Border Background="#1E293B" CornerRadius="4" Padding="5,1">
+                                                        <TextBlock Text="{Binding DeviceType}" FontSize="10" Foreground="{StaticResource AccentCyan}" FontWeight="SemiBold" />
+                                                    </Border>
+                                                </StackPanel>
                                             </StackPanel>
-                                            <Button Grid.Column="2" Content="Öffnen" Style="{StaticResource SubtleButton}" Padding="10,4" Click="BtnOpenHistoryFolder_Click" Tag="{Binding}" />
+
+                                            <!-- Send Button -->
+                                            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                                <Button Content="Senden" Style="{StaticResource PrimaryAuraButton}" Click="BtnSendToDevice_Click" Tag="{Binding}" />
+                                            </StackPanel>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
-                        <StackPanel x:Name="PanelNoHistory" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <TextBlock Text="Noch keine Übertragungen" FontSize="13" Foreground="{StaticResource TextMuted}" />
+
+                        <!-- Empty State -->
+                        <StackPanel x:Name="PanelNoDevicesNearby" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Path Data="{StaticResource GeoReceive}" Stroke="{StaticResource TextMuted}" StrokeThickness="1.8" Stretch="Uniform" Width="36" Height="36" Fill="Transparent" HorizontalAlignment="Center" Margin="0,0,0,12" />
+                            <TextBlock Text="Suche nach Geräten im WLAN-Netzwerk..." FontSize="13" Foreground="{StaticResource TextSecondary}" HorizontalAlignment="Center" />
+                            <TextBlock Text="Stelle sicher, dass beide Geräte im selben WLAN sind und AuraDrop geöffnet haben." FontSize="11" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center" Margin="0,4,0,0" />
                         </StackPanel>
-                        <DockPanel Grid.Row="2" Margin="0,12,0,0">
-                            <Button Content="Verlauf leeren" Style="{StaticResource SubtleButton}" Foreground="{StaticResource AccentRed}" Click="BtnClearHistory_Click" />
-                            <Button Content="Schließen" Style="{StaticResource MintButton}" HorizontalAlignment="Right" Click="BtnCloseHistory_Click" />
-                        </DockPanel>
+
+                        <!-- Troubleshoot Hint -->
+                        <StackPanel Grid.Row="2" HorizontalAlignment="Center" Margin="0,6,0,0">
+                            <TextBlock Text="Direkte IP-Verbindung nutzen, falls dein WLAN Multicast-Discovery blockiert." FontSize="11" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center" />
+                        </StackPanel>
                     </Grid>
+                </Grid>
+
+                <!-- ==================== VIEW 3: EINSTELLUNGEN ==================== -->
+                <Grid x:Name="ViewSettings" Visibility="Collapsed" Margin="32,20,32,24">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel MaxWidth="680" HorizontalAlignment="Left">
+                            <TextBlock Text="Einstellungen" FontSize="22" FontWeight="Bold" Margin="0,0,0,18" />
+
+                            <!-- Card 1: Device Alias -->
+                            <Border Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="14" Padding="20" Margin="0,0,0,14">
+                                <StackPanel>
+                                    <TextBlock Text="Gerätename (Alias im Netzwerk)" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,6" />
+                                    <Grid Margin="0,0,0,6">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox x:Name="TxtSettingsDeviceName" Style="{StaticResource ModernTextBox}" Margin="0,0,8,0" />
+                                        <Button Grid.Column="1" Content="Speichern" Style="{StaticResource PrimaryAuraButton}" Click="BtnSaveDeviceName_Click" />
+                                    </Grid>
+                                    <TextBlock Text="Dieser Name wird anderen Geräten im Netzwerk angezeigt." FontSize="11" Foreground="{StaticResource TextMuted}" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Card 2: Security & PIN Protection -->
+                            <Border Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="14" Padding="20" Margin="0,0,0,14">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                        <Path Data="{StaticResource GeoShieldKey}" Stroke="{StaticResource AccentCyan}" StrokeThickness="1.8" Stretch="Uniform" Width="16" Height="16" Fill="Transparent" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                        <TextBlock Text="Sicherheit &amp; PIN-Schutz" FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock Text="Schütze dein Gerät vor unerwünschten Dateiübertragungen im selben WLAN." FontSize="11" Foreground="{StaticResource TextMuted}" Margin="0,0,0,14" />
+
+                                    <!-- PIN Protection Toggle -->
+                                    <CheckBox x:Name="ChkPinProtection" Content="PIN-Schutz für eingehende Übertragungen erzwingen" FontSize="13" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,12" Click="ChkPinProtection_Click" />
+
+                                    <!-- Configured PIN Input -->
+                                    <TextBlock Text="Dein 6-stelliger Sicherheits-PIN" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,6" />
+                                    <Grid Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="180" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox x:Name="TxtSettingsPinCode" Style="{StaticResource ModernTextBox}" FontSize="15" FontWeight="Bold" Text="123456" MaxLength="6" Margin="0,0,8,0" TextChanged="TxtSettingsPinCode_TextChanged" />
+                                        <Button Grid.Column="1" Content="Zufällig neu" Style="{StaticResource SubtleButton}" Click="BtnGenerateNewPin_Click" Margin="0,0,8,0" />
+                                    </Grid>
+                                    <TextBlock Text="Anderen Teilnehmern im selben Netzwerk muss dieser Code bekannt sein, um Dateien an dich übertragen zu dürfen." FontSize="11" Foreground="{StaticResource TextMuted}" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Card 3: Download Directory -->
+                            <Border Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="14" Padding="20" Margin="0,0,0,14">
+                                <StackPanel>
+                                    <TextBlock Text="Download-Ordner" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,6" />
+                                    <Grid Margin="0,0,0,6">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox x:Name="TxtSettingsDownloadFolder" Style="{StaticResource ModernTextBox}" IsReadOnly="True" Margin="0,0,8,0" />
+                                        <Button Grid.Column="1" Content="Ordner ändern" Style="{StaticResource SubtleButton}" Click="BtnBrowseDownloadFolder_Click" />
+                                    </Grid>
+                                    <TextBlock Text="Alle empfangenen Bilder, Videos und Dokumente werden in voller Originalqualität hier abgelegt." FontSize="11" Foreground="{StaticResource TextMuted}" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Card 4: Network Details -->
+                            <Border Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="14" Padding="20">
+                                <StackPanel>
+                                    <TextBlock Text="Netzwerk-Informationen" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,6" />
+                                    <TextBlock x:Name="TxtSettingsNetwork" Text="IP: 192.168.0.x | Port: 52525" FontSize="12" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,4" />
+                                    <TextBlock Text="Aktives P2P-Protokoll: Direkte Byte-Übertragung ohne Cloud, unbegrenzte Dateigröße." FontSize="11" Foreground="{StaticResource AccentCyan}" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+
+                <!-- ==================== OVERLAYS & MODALS ==================== -->
+
+                <!-- MODAL 1: SEND ANYWHERE PIN CODE SHARING POPUP -->
+                <Border x:Name="BorderPinDisplay" Background="#D9080C14" Visibility="Collapsed" Panel.ZIndex="100">
+                    <Border Width="400" Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderGlowColor}" BorderThickness="1" CornerRadius="18" Padding="28" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <StackPanel HorizontalAlignment="Center">
+                            <Path Data="{StaticResource GeoShieldKey}" Stroke="{StaticResource AccentCyan}" StrokeThickness="2" Stretch="Uniform" Width="36" Height="36" Fill="Transparent" HorizontalAlignment="Center" Margin="0,0,0,12" />
+                            <TextBlock Text="6-stelliger Transfer-PIN" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,8" />
+                            <TextBlock Text="Gib diesen PIN auf dem Empfängergerät ein, um die Dateien sofort herunterzuladen:" FontSize="12" Foreground="{StaticResource TextSecondary}" TextAlignment="Center" TextWrapping="Wrap" Margin="0,0,0,18" />
+                            <Border Background="#0B1220" BorderBrush="{StaticResource AccentCyan}" BorderThickness="2" CornerRadius="14" Padding="24,12" Margin="0,0,0,18">
+                                <TextBlock x:Name="TxtGeneratedPin" Text="000 000" FontSize="36" FontWeight="Bold" Foreground="{StaticResource AccentCyan}" HorizontalAlignment="Center" />
+                            </Border>
+                            <TextBlock Text="Warte auf Abholung im lokalen Netzwerk..." FontSize="11" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center" Margin="0,0,0,20" />
+                            <Button Content="Fertig / Schließen" Style="{StaticResource PrimaryAuraButton}" Click="BtnClosePinOverlay_Click" Width="180" />
+                        </StackPanel>
+                    </Border>
                 </Border>
-            </Border>
+
+                <!-- MODAL 2: FETCH VIA PIN POPUP -->
+                <Border x:Name="BorderFetchPinModal" Background="#D9080C14" Visibility="Collapsed" Panel.ZIndex="105">
+                    <Border Width="400" Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderGlowColor}" BorderThickness="1" CornerRadius="18" Padding="28" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <StackPanel>
+                            <Path Data="{StaticResource GeoReceive}" Stroke="{StaticResource AccentCyan}" StrokeThickness="2" Stretch="Uniform" Width="36" Height="36" Fill="Transparent" HorizontalAlignment="Center" Margin="0,0,0,12" />
+                            <TextBlock Text="Übertragung per PIN abholen" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,8" />
+                            <TextBlock Text="Gib den 6-stelligen Code des Absenders ein:" FontSize="12" Foreground="{StaticResource TextSecondary}" HorizontalAlignment="Center" Margin="0,0,0,18" />
+                            <TextBox x:Name="TxtInputPin" Style="{StaticResource ModernTextBox}" FontSize="24" FontWeight="Bold" TextAlignment="Center" MaxLength="6" Text="" Margin="0,0,0,18" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Button Content="Abbrechen" Style="{StaticResource SubtleButton}" Margin="0,0,6,0" Click="BtnCloseFetchPinModal_Click" />
+                                <Button Grid.Column="1" Content="Abholen" Style="{StaticResource PrimaryAuraButton}" Margin="6,0,0,0" Click="BtnFetchViaPin_Click" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </Border>
+
+                <!-- MODAL 3: LIVE PROGRESS OVERLAY -->
+                <Border x:Name="BorderLiveProgress" Background="#EE080C14" Visibility="Collapsed" Panel.ZIndex="110">
+                    <Border Width="460" Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderGlowColor}" BorderThickness="1" CornerRadius="18" Padding="28" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <StackPanel>
+                            <TextBlock x:Name="TxtProgressTitle" Text="Dateien werden übertragen..." FontSize="18" FontWeight="Bold" Margin="0,0,0,6" />
+                            <TextBlock x:Name="TxtProgressFileName" Text="Datei: 1/5" FontSize="12" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,16" TextTrimming="CharacterEllipsis" />
+                            <ProgressBar x:Name="ProgressBarTransfer" Height="8" Value="0" Maximum="100" Margin="0,0,0,12" Foreground="{StaticResource AccentCyan}" Background="#0B1220" />
+                            <Grid Margin="0,0,0,18">
+                                <TextBlock x:Name="TxtProgressPercent" Text="0%" FontWeight="Bold" FontSize="14" />
+                                <TextBlock x:Name="TxtProgressSpeed" Text="0 MB/s" Foreground="{StaticResource AccentCyan}" HorizontalAlignment="Center" FontWeight="SemiBold" />
+                                <TextBlock x:Name="TxtProgressEta" Text="ETA: --:--" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Right" />
+                            </Grid>
+                            <Button Content="Übertragung abbrechen" Style="{StaticResource SubtleButton}" Foreground="{StaticResource AccentRed}" HorizontalAlignment="Right" Click="BtnCancelTransfer_Click" />
+                        </StackPanel>
+                    </Border>
+                </Border>
+
+                <!-- MODAL 4: INCOMING TRANSFER REQUEST PROMPT -->
+                <Border x:Name="BorderIncomingPrompt" Background="#E6080C14" Visibility="Collapsed" Panel.ZIndex="120">
+                    <Border Width="420" Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderGlowColor}" BorderThickness="1" CornerRadius="18" Padding="26" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <StackPanel>
+                            <Path Data="{StaticResource GeoReceive}" Stroke="{StaticResource AccentCyan}" StrokeThickness="2" Stretch="Uniform" Width="32" Height="32" Fill="Transparent" Margin="0,0,0,10" />
+                            <TextBlock Text="Eingehende Übertragungsanfrage" FontSize="17" FontWeight="Bold" Margin="0,0,0,8" />
+                            <TextBlock x:Name="TxtIncomingPromptMessage" Text="Gerät möchte Dateien senden." FontSize="13" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,20" TextWrapping="Wrap" />
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Content="Ablehnen" Style="{StaticResource SubtleButton}" Foreground="{StaticResource AccentRed}" Margin="0,0,10,0" Click="BtnRejectIncoming_Click" />
+                                <Button Content="Akzeptieren" Style="{StaticResource PrimaryAuraButton}" Click="BtnAcceptIncoming_Click" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Border>
+
+                <!-- MODAL 5: TRANSFER HISTORY -->
+                <Border x:Name="BorderHistoryModal" Background="#E6080C14" Visibility="Collapsed" Panel.ZIndex="130">
+                    <Border Width="640" Height="500" Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="18" Padding="24">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <DockPanel Grid.Row="0" Margin="0,0,0,14">
+                                <TextBlock Text="Übertragungsverlauf" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
+                                <Button Style="{StaticResource CaptionButton}" Width="32" Height="32" HorizontalAlignment="Right" Click="BtnCloseHistory_Click">
+                                    <Path Data="{StaticResource GeoClose}" Stroke="{StaticResource TextSecondary}" StrokeThickness="1.8" Stretch="Uniform" Width="10" Height="10" />
+                                </Button>
+                            </DockPanel>
+                            <ListBox x:Name="ListHistory" Grid.Row="1" Background="Transparent" BorderThickness="0">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="#0F1728" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,0,0,8">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="32" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <Path Grid.Column="0" Stroke="{StaticResource AccentCyan}" StrokeThickness="1.6" Stretch="Uniform" Width="16" Height="16" Fill="Transparent" VerticalAlignment="Center">
+                                                    <Path.Style>
+                                                        <Style TargetType="Path">
+                                                            <Setter Property="Data" Value="{StaticResource GeoReceive}" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Direction}" Value="Outgoing">
+                                                                    <Setter Property="Data" Value="{StaticResource GeoSend}" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Path.Style>
+                                                </Path>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,10,0">
+                                                    <TextBlock Text="{Binding SummaryText}" FontWeight="Bold" FontSize="13" />
+                                                    <TextBlock Text="{Binding Timestamp, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}" FontSize="11" Foreground="{StaticResource TextMuted}" />
+                                                </StackPanel>
+                                                <Button Grid.Column="2" Content="Öffnen" Style="{StaticResource SubtleButton}" Padding="10,4" Click="BtnOpenHistoryFolder_Click" Tag="{Binding}" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                            <StackPanel x:Name="PanelNoHistory" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="Noch keine Übertragungen aufgezeichnet." FontSize="13" Foreground="{StaticResource TextMuted}" />
+                            </StackPanel>
+                            <DockPanel Grid.Row="2" Margin="0,12,0,0">
+                                <Button Content="Verlauf leeren" Style="{StaticResource SubtleButton}" Foreground="{StaticResource AccentRed}" Click="BtnClearHistory_Click" />
+                                <Button Content="Schließen" Style="{StaticResource PrimaryAuraButton}" HorizontalAlignment="Right" Click="BtnCloseHistory_Click" />
+                            </DockPanel>
+                        </Grid>
+                    </Border>
+                </Border>
+
+            </Grid>
         </Grid>
     </Grid>
 </Window>

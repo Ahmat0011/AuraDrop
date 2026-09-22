@@ -4,35 +4,133 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
-            <!-- LocalSend Mint & Dark Emerald Palette -->
-            <Color x:Key="ColorBgPrimary">#101A18</Color>
-            <Color x:Key="ColorBgSecondary">#0E1715</Color>
-            <Color x:Key="ColorBgCard">#192724</Color>
-            <Color x:Key="ColorBgCardHover">#233632</Color>
-            <Color x:Key="ColorBorder">#253935</Color>
-            <Color x:Key="ColorMint">#5CD6B0</Color>
-            <Color x:Key="ColorMintDark">#40B893</Color>
-            <Color x:Key="ColorPillActive">#263E37</Color>
-            <Color x:Key="ColorTextPrimary">#F0FDF8</Color>
-            <Color x:Key="ColorTextSecondary">#8CA39C</Color>
-            <Color x:Key="ColorTextMuted">#58736B</Color>
+            <!-- AuraDrop Obsidian & Cyber Aura Palette (Distinct from LocalSend) -->
+            <Color x:Key="ColorBgPrimary">#080C14</Color>
+            <Color x:Key="ColorBgSecondary">#0D131F</Color>
+            <Color x:Key="ColorBgCard">#131B2E</Color>
+            <Color x:Key="ColorBgCardHover">#1A253E</Color>
+            <Color x:Key="ColorBorder">#1E2C48</Color>
+            <Color x:Key="ColorBorderGlow">#334A75</Color>
+
+            <!-- Accents: Vibrant Cyber Cyan & Electric Indigo -->
+            <Color x:Key="ColorAccentCyan">#38BDF8</Color>
+            <Color x:Key="ColorAccentIndigo">#6366F1</Color>
+            <Color x:Key="ColorAccentCyanDark">#0284C7</Color>
+            <Color x:Key="ColorPillActive">#1E293B</Color>
+
+            <Color x:Key="ColorTextPrimary">#F8FAFC</Color>
+            <Color x:Key="ColorTextSecondary">#94A3B8</Color>
+            <Color x:Key="ColorTextMuted">#64748B</Color>
+            <Color x:Key="ColorGreen">#10B981</Color>
+            <Color x:Key="ColorRed">#F43F5E</Color>
 
             <SolidColorBrush x:Key="BgPrimary" Color="{StaticResource ColorBgPrimary}" />
             <SolidColorBrush x:Key="BgSecondary" Color="{StaticResource ColorBgSecondary}" />
             <SolidColorBrush x:Key="BgCard" Color="{StaticResource ColorBgCard}" />
             <SolidColorBrush x:Key="BgCardHover" Color="{StaticResource ColorBgCardHover}" />
             <SolidColorBrush x:Key="BorderColor" Color="{StaticResource ColorBorder}" />
-            <SolidColorBrush x:Key="AccentMint" Color="{StaticResource ColorMint}" />
-            <SolidColorBrush x:Key="AccentMintDark" Color="{StaticResource ColorMintDark}" />
+            <SolidColorBrush x:Key="BorderGlowColor" Color="{StaticResource ColorBorderGlow}" />
+            
+            <SolidColorBrush x:Key="AccentCyan" Color="{StaticResource ColorAccentCyan}" />
+            <SolidColorBrush x:Key="AccentIndigo" Color="{StaticResource ColorAccentIndigo}" />
             <SolidColorBrush x:Key="PillActive" Color="{StaticResource ColorPillActive}" />
+            
             <SolidColorBrush x:Key="TextPrimary" Color="{StaticResource ColorTextPrimary}" />
             <SolidColorBrush x:Key="TextSecondary" Color="{StaticResource ColorTextSecondary}" />
             <SolidColorBrush x:Key="TextMuted" Color="{StaticResource ColorTextMuted}" />
-            <SolidColorBrush x:Key="AccentRed" Color="#F87171" />
+            <SolidColorBrush x:Key="AccentGreen" Color="{StaticResource ColorGreen}" />
+            <SolidColorBrush x:Key="AccentRed" Color="{StaticResource ColorRed}" />
 
+            <!-- Electric Aura Gradient -->
+            <LinearGradientBrush x:Key="AuraGradient" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#6366F1" Offset="0.0" />
+                <GradientStop Color="#38BDF8" Offset="1.0" />
+            </LinearGradientBrush>
+
+            <LinearGradientBrush x:Key="AuraGradientSubtle" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#251E4E" Offset="0.0" />
+                <GradientStop Color="#102E44" Offset="1.0" />
+            </LinearGradientBrush>
+
+            <!-- Vector Geometries (Lucide / Feather Style - Crisp at any scale) -->
+            <StreamGeometry x:Key="GeoSend">M 22,2 L 11,13 M 22,2 L 15,22 L 11,13 L 2,9 Z</StreamGeometry>
+            <StreamGeometry x:Key="GeoReceive">M 21,15 V 19 A 2,2 0 0 1 19,21 H 5 A 2,2 0 0 1 3,19 V 15 M 7,10 L 12,15 L 17,10 M 12,15 V 3</StreamGeometry>
+            <StreamGeometry x:Key="GeoSettings">M 12,15 A 3,3 0 1 0 12,9 A 3,3 0 0 0 12,15 Z M 19.4,15 A 1.65,1.65 0 0 0 19.73,16.82 L 19.79,16.88 A 2,2 0 0 1 16.96,19.71 L 16.9,19.65 A 1.65,1.65 0 0 0 15.08,19.32 A 1.65,1.65 0 0 0 14,20.83 V 21 A 2,2 0 0 1 10,21 V 20.91 A 1.65,1.65 0 0 0 9,19.4 A 1.65,1.65 0 0 0 7.18,19.73 L 7.12,19.79 A 2,2 0 0 1 4.29,16.96 L 4.35,16.9 A 1.65,1.65 0 0 0 4.68,15.08 A 1.65,1.65 0 0 0 3.17,14 H 3 A 2,2 0 0 1 3,10 H 3.09 A 1.65,1.65 0 0 0 4.6,9 A 1.65,1.65 0 0 0 4.27,7.18 L 4.21,7.12 A 2,2 0 0 1 7.04,4.29 L 7.1,4.35 A 1.65,1.65 0 0 0 8.92,4.68 A 1.65,1.65 0 0 0 10,3.17 V 3 A 2,2 0 0 1 14,3 V 3.09 A 1.65,1.65 0 0 0 15,4.6 A 1.65,1.65 0 0 0 16.82,4.27 L 16.88,4.21 A 2,2 0 0 1 19.71,7.04 L 19.65,7.1 A 1.65,1.65 0 0 0 19.32,8.92 A 1.65,1.65 0 0 0 20.83,10 H 21 A 2,2 0 0 1 21,14 H 20.91 A 1.65,1.65 0 0 0 19.4,15 Z</StreamGeometry>
+            <StreamGeometry x:Key="GeoHistory">M 12,8 V 12 L 15,15 M 12,22 A 10,10 0 1 0 12,2 A 10,10 0 0 0 12,22 Z</StreamGeometry>
+            <StreamGeometry x:Key="GeoInfo">M 12,16 V 12 M 12,8 H 12.01 M 12,22 A 10,10 0 1 0 12,2 A 10,10 0 0 0 12,22 Z</StreamGeometry>
+            <StreamGeometry x:Key="GeoMedia">M 19,3 H 5 A 2,2 0 0 0 3,5 V 19 A 2,2 0 0 0 5,21 H 19 A 2,2 0 0 0 21,19 V 5 A 2,2 0 0 0 19,3 Z M 8.5,10 A 1.5,1.5 0 1 1 8.5,7 A 1.5,1.5 0 0 1 8.5,10 Z M 21,15 L 16,10 L 5,21</StreamGeometry>
+            <StreamGeometry x:Key="GeoText">M 14,2 H 6 A 2,2 0 0 0 4,4 V 20 A 2,2 0 0 0 6,22 H 18 A 2,2 0 0 0 20,20 V 8 Z M 14,2 V 8 H 20 M 16,13 H 8 M 16,17 H 8 M 10,9 H 8</StreamGeometry>
+            <StreamGeometry x:Key="GeoFile">M 13,2 H 6 A 2,2 0 0 0 4,4 V 20 A 2,2 0 0 0 6,22 H 18 A 2,2 0 0 0 20,20 V 9 Z M 13,2 V 9 H 20</StreamGeometry>
+            <StreamGeometry x:Key="GeoFolder">M 22,19 A 2,2 0 0 1 20,21 H 4 A 2,2 0 0 1 2,19 V 5 A 2,2 0 0 1 4,3 H 9 L 11,6 H 20 A 2,2 0 0 1 22,8 Z</StreamGeometry>
+            <StreamGeometry x:Key="GeoShieldKey">M 12,22 S 20,18 20,12 V 5 L 12,2 L 4,5 V 12 S 4,18 12,22 Z M 12,8 A 2,2 0 1 0 12,12 A 2,2 0 0 0 12,8 Z M 12,12 V 16</StreamGeometry>
+            <StreamGeometry x:Key="GeoRefresh">M 23,4 V 10 H 17 M 1,20 V 14 H 7 M 3.51,9 A 9,9 0 0 1 18.36,5.64 L 23,10 M 1,14 L 5.64,18.36 A 9,9 0 0 0 20.49,15</StreamGeometry>
+            <StreamGeometry x:Key="GeoDirectIp">M 12,2 A 10,10 0 1 0 12,22 A 10,10 0 0 0 12,2 Z M 12,6 A 6,6 0 1 0 12,18 A 6,6 0 0 0 12,6 Z M 12,10 A 2,2 0 1 0 12,14 A 2,2 0 0 0 12,10 Z</StreamGeometry>
+            <StreamGeometry x:Key="GeoComputer">M 20,3 H 4 A 2,2 0 0 0 2,5 V 15 A 2,2 0 0 0 4,17 H 20 A 2,2 0 0 0 22,15 V 5 A 2,2 0 0 0 20,3 Z M 8,21 H 16 M 12,17 V 21</StreamGeometry>
+            <StreamGeometry x:Key="GeoSmartphone">M 17,2 H 7 A 2,2 0 0 0 5,4 V 20 A 2,2 0 0 0 7,22 H 17 A 2,2 0 0 0 19,20 V 4 A 2,2 0 0 0 17,2 Z M 12,18 H 12.01</StreamGeometry>
+            <StreamGeometry x:Key="GeoClose">M 18,6 L 6,18 M 6,6 L 18,18</StreamGeometry>
+            <StreamGeometry x:Key="GeoCheck">M 20,6 L 9,17 L 4,12</StreamGeometry>
+            <StreamGeometry x:Key="GeoMinimize">M 4,12 H 20</StreamGeometry>
+            <StreamGeometry x:Key="GeoMaximize">M 4,4 H 20 V 20 H 4 Z</StreamGeometry>
+
+            <!-- Global Typography -->
             <Style TargetType="TextBlock">
                 <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
-                <Setter Property="FontFamily" Value="Segoe UI, -apple-system, sans-serif" />
+                <Setter Property="FontFamily" Value="Segoe UI, Inter, -apple-system, sans-serif" />
+            </Style>
+
+            <!-- Caption Button Styles for Window Controls -->
+            <Style x:Key="CaptionButton" TargetType="Button">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Foreground" Value="{StaticResource TextSecondary}" />
+                <Setter Property="Width" Value="46" />
+                <Setter Property="Height" Value="38" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="bd" Background="{TemplateBinding Background}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="bd" Property="Background" Value="#1E293B" />
+                                    <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="bd" Property="Background" Value="#334155" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="CaptionCloseButton" TargetType="Button">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Foreground" Value="{StaticResource TextSecondary}" />
+                <Setter Property="Width" Value="46" />
+                <Setter Property="Height" Value="38" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="bd" Background="{TemplateBinding Background}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="bd" Property="Background" Value="#EF4444" />
+                                    <Setter Property="Foreground" Value="#FFFFFF" />
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="bd" Property="Background" Value="#DC2626" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
             </Style>
 
             <!-- Pill Navigation RadioButton Style -->
@@ -43,20 +141,22 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="RadioButton">
-                            <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="20" Padding="16,10">
+                            <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="12" Padding="14,10" BorderThickness="1" BorderBrush="Transparent">
                                 <ContentPresenter VerticalAlignment="Center" />
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsChecked" Value="True">
-                                    <Setter TargetName="border" Property="Background" Value="{StaticResource PillActive}" />
-                                    <Setter Property="Foreground" Value="{StaticResource AccentMint}" />
+                                    <Setter TargetName="border" Property="Background" Value="#172238" />
+                                    <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource BorderGlowColor}" />
+                                    <Setter Property="Foreground" Value="{StaticResource AccentCyan}" />
                                 </Trigger>
                                 <MultiTrigger>
                                     <MultiTrigger.Conditions>
                                         <Condition Property="IsMouseOver" Value="True" />
                                         <Condition Property="IsChecked" Value="False" />
                                     </MultiTrigger.Conditions>
-                                    <Setter TargetName="border" Property="Background" Value="#172421" />
+                                    <Setter TargetName="border" Property="Background" Value="#131B2E" />
+                                    <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
                                 </MultiTrigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -71,20 +171,20 @@
                 <Setter Property="BorderBrush" Value="{StaticResource BorderColor}" />
                 <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="Cursor" Value="Hand" />
-                <Setter Property="Padding" Value="16,14" />
+                <Setter Property="Padding" Value="14,14" />
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
-                            <Border x:Name="bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="12" Padding="{TemplateBinding Padding}">
+                            <Border x:Name="bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="14" Padding="{TemplateBinding Padding}">
                                 <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
                                     <Setter TargetName="bd" Property="Background" Value="{StaticResource BgCardHover}" />
-                                    <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource AccentMint}" />
+                                    <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource AccentCyan}" />
                                 </Trigger>
                                 <Trigger Property="IsPressed" Value="True">
-                                    <Setter TargetName="bd" Property="Background" Value="#121D1A" />
+                                    <Setter TargetName="bd" Property="Background" Value="#0E1626" />
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -92,11 +192,11 @@
                 </Setter>
             </Style>
 
-            <!-- Mint Primary Button -->
-            <Style x:Key="MintButton" TargetType="Button">
-                <Setter Property="Background" Value="{StaticResource AccentMint}" />
-                <Setter Property="Foreground" Value="#091412" />
-                <Setter Property="FontWeight" Value="Bold" />
+            <!-- Primary Gradient Action Button -->
+            <Style x:Key="PrimaryAuraButton" TargetType="Button">
+                <Setter Property="Background" Value="{StaticResource AuraGradient}" />
+                <Setter Property="Foreground" Value="#FFFFFF" />
+                <Setter Property="FontWeight" Value="SemiBold" />
                 <Setter Property="FontSize" Value="13" />
                 <Setter Property="Padding" Value="16,8" />
                 <Setter Property="BorderThickness" Value="0" />
@@ -104,7 +204,7 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
-                            <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="20" Padding="{TemplateBinding Padding}">
+                            <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="10" Padding="{TemplateBinding Padding}">
                                 <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </Border>
                             <ControlTemplate.Triggers>
@@ -132,12 +232,13 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
-                            <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                            <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="9" Padding="{TemplateBinding Padding}">
                                 <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
                                     <Setter TargetName="border" Property="Background" Value="{StaticResource BgCardHover}" />
+                                    <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource BorderGlowColor}" />
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -153,13 +254,18 @@
                 <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="Padding" Value="12,8" />
                 <Setter Property="FontSize" Value="13" />
-                <Setter Property="CaretBrush" Value="{StaticResource AccentMint}" />
+                <Setter Property="CaretBrush" Value="{StaticResource AccentCyan}" />
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="TextBox">
-                            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8">
-                                <ScrollViewer x:Name="PART_ContentHost" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                            <Border x:Name="bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="9">
+                                <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}" />
                             </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsFocused" Value="True">
+                                    <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource AccentCyan}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>

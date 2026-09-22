@@ -4,27 +4,27 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <!-- LocalSend Mint & Dark Emerald Palette -->
-    <Color x:Key="Primary">#5CD6B0</Color>
-    <Color x:Key="PrimaryDark">#40B893</Color>
-    <Color x:Key="PrimaryLight">#7FEAC7</Color>
-    <Color x:Key="Secondary">#263E37</Color>
-    <Color x:Key="Accent">#5CD6B0</Color>
-    <Color x:Key="Success">#5CD6B0</Color>
+    <!-- AuraDrop Obsidian & Cyber Aura Palette (Distinct from LocalSend) -->
+    <Color x:Key="Primary">#38BDF8</Color>
+    <Color x:Key="PrimaryDark">#0284C7</Color>
+    <Color x:Key="PrimaryLight">#7DD3FC</Color>
+    <Color x:Key="Secondary">#1E293B</Color>
+    <Color x:Key="Accent">#6366F1</Color>
+    <Color x:Key="Success">#10B981</Color>
     <Color x:Key="Warning">#F59E0B</Color>
-    <Color x:Key="Danger">#F87171</Color>
+    <Color x:Key="Danger">#F43F5E</Color>
 
-    <!-- Backgrounds & Surfaces (LocalSend OLED Emerald Dark Mode) -->
-    <Color x:Key="BackgroundDark">#101A18</Color>
-    <Color x:Key="SurfaceDark">#14211E</Color>
-    <Color x:Key="SurfaceLightDark">#1A2825</Color>
-    <Color x:Key="CardBackground">#1A2825</Color>
-    <Color x:Key="CardBorder">#253935</Color>
+    <!-- Backgrounds & Surfaces (Obsidian OLED Dark Mode) -->
+    <Color x:Key="BackgroundDark">#080C14</Color>
+    <Color x:Key="SurfaceDark">#0D131F</Color>
+    <Color x:Key="SurfaceLightDark">#141D2F</Color>
+    <Color x:Key="CardBackground">#131B2E</Color>
+    <Color x:Key="CardBorder">#1E2C48</Color>
 
     <!-- Text Colors -->
-    <Color x:Key="TextPrimary">#F0FDF8</Color>
-    <Color x:Key="TextSecondary">#8CA39C</Color>
-    <Color x:Key="TextMuted">#58736B</Color>
+    <Color x:Key="TextPrimary">#F8FAFC</Color>
+    <Color x:Key="TextSecondary">#94A3B8</Color>
+    <Color x:Key="TextMuted">#64748B</Color>
     <Color x:Key="White">#FFFFFF</Color>
 
     <!-- Brushes -->
@@ -36,7 +36,7 @@
     <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondary}" />
 
     <LinearGradientBrush x:Key="BrandGradient" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#5CD6B0" Offset="0.0" />
-        <GradientStop Color="#40B893" Offset="1.0" />
+        <GradientStop Color="#6366F1" Offset="0.0" />
+        <GradientStop Color="#38BDF8" Offset="1.0" />
     </LinearGradientBrush>
 </ResourceDictionary>

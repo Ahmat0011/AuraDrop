@@ -7,14 +7,31 @@
 
     <Grid RowDefinitions="Auto, *, Auto">
 
-        <!-- Top App Bar (Matching Images 2 & 3: AuraDrop + 🕒 History + ℹ️ Info) -->
-        <Border Grid.Row="0" BackgroundColor="{StaticResource SurfaceDark}" Stroke="{StaticResource CardBorder}" StrokeThickness="0,0,0,1" Padding="20,12">
+        <!-- Top App Bar -->
+        <Border Grid.Row="0" BackgroundColor="{StaticResource SurfaceDark}" Stroke="{StaticResource CardBorder}" StrokeThickness="0,0,0,1" Padding="16,10">
             <Grid ColumnDefinitions="*, Auto">
-                <Label Grid.Column="0" Text="AuraDrop" FontSize="22" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" VerticalOptions="Center" />
+                <HorizontalStackLayout Grid.Column="0" Spacing="8" VerticalOptions="Center">
+                    <Border WidthRequest="24" HeightRequest="24" StrokeShape="RoundRectangle 6" BackgroundColor="{StaticResource Accent}" VerticalOptions="Center">
+                        <Path Data="M 22,2 L 11,13 M 22,2 L 15,22 L 11,13 L 2,9 Z" Stroke="White" StrokeThickness="1.5" Aspect="Uniform" WidthRequest="12" HeightRequest="12" HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                    <Label Text="AuraDrop" FontSize="20" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" VerticalOptions="Center" />
+                </HorizontalStackLayout>
                 
                 <HorizontalStackLayout Grid.Column="1" Spacing="8" VerticalOptions="Center">
-                    <Button Text="🕒" FontSize="16" BackgroundColor="Transparent" Padding="8,4" Clicked="OnOpenHistoryClicked" />
-                    <Button Text="ℹ️" FontSize="16" BackgroundColor="Transparent" Padding="8,4" Clicked="OnOpenInfoClicked" />
+                    <!-- History Button with Vector Path -->
+                    <Border BackgroundColor="Transparent" Padding="8,6" StrokeShape="RoundRectangle 8">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnOpenHistoryClicked" />
+                        </Border.GestureRecognizers>
+                        <Path Data="M 12,8 V 12 L 15,15 M 12,22 A 10,10 0 1 0 12,2 A 10,10 0 0 0 12,22 Z" Stroke="{StaticResource TextSecondary}" StrokeThickness="1.8" Aspect="Uniform" WidthRequest="18" HeightRequest="18" />
+                    </Border>
+                    <!-- Info Button with Vector Path -->
+                    <Border BackgroundColor="Transparent" Padding="8,6" StrokeShape="RoundRectangle 8">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnOpenInfoClicked" />
+                        </Border.GestureRecognizers>
+                        <Path Data="M 12,16 V 12 M 12,8 H 12.01 M 12,22 A 10,10 0 1 0 12,2 A 10,10 0 0 0 12,22 Z" Stroke="{StaticResource TextSecondary}" StrokeThickness="1.8" Aspect="Uniform" WidthRequest="18" HeightRequest="18" />
+                    </Border>
                 </HorizontalStackLayout>
             </Grid>
         </Border>
@@ -22,7 +39,7 @@
         <!-- Center Content Views -->
         <Grid Grid.Row="1">
 
-            <!-- ==================== VIEW 1: RECEIVE (Matching Image 2) ==================== -->
+            <!-- ==================== VIEW 1: RECEIVE ==================== -->
             <ScrollView x:Name="ViewReceive" IsVisible="True" Padding="20">
                 <VerticalStackLayout Spacing="24" VerticalOptions="Center">
 
@@ -31,14 +48,14 @@
                         <GraphicsView x:Name="RadarCanvas" WidthRequest="150" HeightRequest="150" HorizontalOptions="Center" />
                     </Border>
 
-                    <!-- Device Name & IP Hash (Matching Image 2: "Nice Grape", "#79 #77") -->
+                    <!-- Device Name & IP Hash -->
                     <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
-                        <Label x:Name="LblCenterDeviceName" Text="Nice Grape" FontSize="30" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" HorizontalOptions="Center" />
-                        <Label x:Name="LblCenterDeviceHash" Text="#190" FontSize="18" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" />
+                        <Label x:Name="LblCenterDeviceName" Text="Android Phone" FontSize="26" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" HorizontalOptions="Center" />
+                        <Label x:Name="LblCenterDeviceHash" Text="#190" FontSize="16" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" />
                     </VerticalStackLayout>
 
-                    <!-- Quick Save Switch (Matching Image 2) -->
-                    <Border BackgroundColor="{StaticResource CardBackground}" Stroke="{StaticResource CardBorder}" StrokeThickness="1" StrokeShape="RoundRectangle 20" Padding="14,8" HorizontalOptions="Center">
+                    <!-- Quick Save Switch -->
+                    <Border BackgroundColor="{StaticResource CardBackground}" Stroke="{StaticResource CardBorder}" StrokeThickness="1" StrokeShape="RoundRectangle 16" Padding="16,8" HorizontalOptions="Center">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnToggleQuickSaveClicked" />
                         </Border.GestureRecognizers>
@@ -48,38 +65,37 @@
                         </HorizontalStackLayout>
                     </Border>
 
-                    <!-- Send Anywhere PIN Fetch Card -->
-                    <Border BackgroundColor="{StaticResource CardBackground}" Stroke="{StaticResource CardBorder}" StrokeThickness="1" StrokeShape="RoundRectangle 14" Padding="16" Margin="0,10,0,0">
-                        <VerticalStackLayout Spacing="10">
-                            <Label Text="🔑 Send Anywhere PIN abholen" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" />
-                            <Label Text="Gib den 6-stelligen Code ein, den der Absender generiert hat:" FontSize="11" TextColor="{StaticResource TextSecondary}" />
-                            <Grid ColumnDefinitions="*, Auto" ColumnSpacing="8">
-                                <Entry x:Name="EntryPin" Text="123456" FontSize="18" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="{StaticResource Accent}" BackgroundColor="{StaticResource SurfaceDark}" Keyboard="Numeric" MaxLength="7" />
-                                <Button Grid.Column="1" Text="Abholen" BackgroundColor="{StaticResource Primary}" TextColor="#091412" FontAttributes="Bold" CornerRadius="8" Clicked="OnFetchViaPinClicked" />
-                            </Grid>
-                        </VerticalStackLayout>
+                    <!-- Subtle PIN Fetch Action Button -->
+                    <Border BackgroundColor="{StaticResource CardBackground}" Stroke="{StaticResource CardBorder}" StrokeThickness="1" StrokeShape="RoundRectangle 12" Padding="14,10" HorizontalOptions="Center">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnPromptFetchPinClicked" />
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="8">
+                            <Path Data="M 12,22 S 20,18 20,12 V 5 L 12,2 L 4,5 V 12 S 4,18 12,22 Z M 12,8 A 2,2 0 1 0 12,12 A 2,2 0 0 0 12,8 Z M 12,12 V 16" Stroke="{StaticResource Primary}" StrokeThickness="1.6" Aspect="Uniform" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
+                            <Label Text="Per 6-stelligem PIN abholen..." FontSize="12" TextColor="{StaticResource TextSecondary}" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
                     </Border>
 
                     <!-- Directory Hint -->
-                    <Label x:Name="LblSaveDirectory" Text="Dateien werden in Downloads/AuraDrop gespeichert" FontSize="11" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" />
+                    <Label x:Name="LblSaveDirectory" Text="Dateien werden in Downloads/AuraDrop gespeichert (100% Originalqualität)" FontSize="11" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" HorizontalTextAlignment="Center" />
                 </VerticalStackLayout>
             </ScrollView>
 
-            <!-- ==================== VIEW 2: SEND (Matching Images 3 & 4) ==================== -->
+            <!-- ==================== VIEW 2: SEND ==================== -->
             <ScrollView x:Name="ViewSend" IsVisible="False" Padding="16">
                 <VerticalStackLayout Spacing="16">
 
-                    <!-- Section: Selection (Matching Images 3 & 4: Media, Text, File, Folder) -->
-                    <Label Text="Selection" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource TextSecondary}" />
+                    <!-- Section: Selection (Media, Text, File, Folder) -->
+                    <Label Text="DATEIEN ZUM SENDEN" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource TextMuted}" />
                     <Grid ColumnDefinitions="*, *, *, *" ColumnSpacing="8">
                         <!-- Media Card -->
                         <Border Grid.Column="0" BackgroundColor="{StaticResource CardBackground}" Stroke="{StaticResource CardBorder}" StrokeThickness="1" StrokeShape="RoundRectangle 12" Padding="10">
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnPickPhotosClicked" />
                             </Border.GestureRecognizers>
-                            <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
-                                <Label Text="🖼️" FontSize="22" HorizontalOptions="Center" />
-                                <Label Text="Media" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" HorizontalOptions="Center" />
+                            <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
+                                <Path Data="M 19,3 H 5 A 2,2 0 0 0 3,5 V 19 A 2,2 0 0 0 5,21 H 19 A 2,2 0 0 0 21,19 V 5 A 2,2 0 0 0 19,3 Z M 8.5,10 A 1.5,1.5 0 1 1 8.5,7 A 1.5,1.5 0 0 1 8.5,10 Z M 21,15 L 16,10 L 5,21" Stroke="{StaticResource Primary}" StrokeThickness="1.8" Aspect="Uniform" WidthRequest="22" HeightRequest="22" HorizontalOptions="Center" />
+                                <Label Text="Medien" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" HorizontalOptions="Center" />
                             </VerticalStackLayout>
                         </Border>
 
@@ -88,9 +104,9 @@
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnSendTextClicked" />
                             </Border.GestureRecognizers>
-                            <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
-                                <Label Text="📝" FontSize="22" HorizontalOptions="Center" />
-                                <Label Text="Text" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" HorizontalOptions="Center" />
+                            <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
+                                <Path Data="M 14,2 H 6 A 2,2 0 0 0 4,4 V 20 A 2,2 0 0 0 6,22 H 18 A 2,2 0 0 0 20,20 V 8 Z M 14,2 V 8 H 20 M 16,13 H 8 M 16,17 H 8 M 10,9 H 8" Stroke="{StaticResource Accent}" StrokeThickness="1.8" Aspect="Uniform" WidthRequest="22" HeightRequest="22" HorizontalOptions="Center" />
+                                <Label Text="Text" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" HorizontalOptions="Center" />
                             </VerticalStackLayout>
                         </Border>
 
@@ -99,61 +115,65 @@
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnPickFilesClicked" />
                             </Border.GestureRecognizers>
-                            <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
-                                <Label Text="📄" FontSize="22" HorizontalOptions="Center" />
-                                <Label Text="File" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" HorizontalOptions="Center" />
+                            <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
+                                <Path Data="M 13,2 H 6 A 2,2 0 0 0 4,4 V 20 A 2,2 0 0 0 6,22 H 18 A 2,2 0 0 0 20,20 V 9 Z M 13,2 V 9 H 20" Stroke="{StaticResource Primary}" StrokeThickness="1.8" Aspect="Uniform" WidthRequest="22" HeightRequest="22" HorizontalOptions="Center" />
+                                <Label Text="Dateien" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" HorizontalOptions="Center" />
                             </VerticalStackLayout>
                         </Border>
 
-                        <!-- Folder Card -->
+                        <!-- PIN Sharing Card -->
                         <Border Grid.Column="3" BackgroundColor="{StaticResource CardBackground}" Stroke="{StaticResource CardBorder}" StrokeThickness="1" StrokeShape="RoundRectangle 12" Padding="10">
                             <Border.GestureRecognizers>
-                                <TapGestureRecognizer Tapped="OnPickFolderClicked" />
+                                <TapGestureRecognizer Tapped="OnGeneratePinClicked" />
                             </Border.GestureRecognizers>
-                            <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
-                                <Label Text="📁" FontSize="22" HorizontalOptions="Center" />
-                                <Label Text="Folder" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" HorizontalOptions="Center" />
+                            <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
+                                <Path Data="M 12,22 S 20,18 20,12 V 5 L 12,2 L 4,5 V 12 S 4,18 12,22 Z M 12,8 A 2,2 0 1 0 12,12 A 2,2 0 0 0 12,8 Z M 12,12 V 16" Stroke="{StaticResource Accent}" StrokeThickness="1.8" Aspect="Uniform" WidthRequest="22" HeightRequest="22" HorizontalOptions="Center" />
+                                <Label Text="PIN Code" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" HorizontalOptions="Center" />
                             </VerticalStackLayout>
                         </Border>
                     </Grid>
 
                     <!-- Selected Files Banner -->
-                    <Border x:Name="BorderSelectedFiles" BackgroundColor="{StaticResource SurfaceDark}" Stroke="{StaticResource CardBorder}" StrokeThickness="1" StrokeShape="RoundRectangle 12" Padding="12" IsVisible="False">
+                    <Border x:Name="BorderSelectedFiles" BackgroundColor="{StaticResource CardBackground}" Stroke="{StaticResource Primary}" StrokeThickness="1" StrokeShape="RoundRectangle 12" Padding="12" IsVisible="False">
                         <Grid ColumnDefinitions="*, Auto">
                             <VerticalStackLayout VerticalOptions="Center">
                                 <Label x:Name="LblSelectedCount" Text="0 Dateien ausgewählt" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" />
-                                <Label x:Name="LblSelectedSize" Text="0 MB" FontSize="11" TextColor="{StaticResource Accent}" />
+                                <Label x:Name="LblSelectedSize" Text="0 MB" FontSize="11" TextColor="{StaticResource Primary}" />
                             </VerticalStackLayout>
                             <Button Grid.Column="1" Text="Leeren" FontSize="11" BackgroundColor="Transparent" TextColor="{StaticResource Danger}" Clicked="OnClearFilesClicked" />
                         </Grid>
                     </Border>
 
-                    <!-- Section: Nearby devices (Matching Images 3 & 4) -->
+                    <!-- Section: Nearby devices -->
                     <Grid ColumnDefinitions="*, Auto" Margin="0,4,0,0">
-                        <Label Text="Nearby devices" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource TextSecondary}" VerticalOptions="Center" />
+                        <Label Text="GERÄTE IM WLAN" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource TextMuted}" VerticalOptions="Center" />
                         <HorizontalStackLayout Grid.Column="1" Spacing="10" VerticalOptions="Center">
-                            <Label Text="🔄" FontSize="16" VerticalOptions="Center">
-                                <Label.GestureRecognizers>
+                            <!-- Refresh Button -->
+                            <Border BackgroundColor="Transparent" Padding="4">
+                                <Border.GestureRecognizers>
                                     <TapGestureRecognizer Tapped="OnRefreshDevicesClicked" />
-                                </Label.GestureRecognizers>
-                            </Label>
-                            <Label Text="🎯" FontSize="16" VerticalOptions="Center">
-                                <Label.GestureRecognizers>
+                                </Border.GestureRecognizers>
+                                <Path Data="M 23,4 V 10 H 17 M 1,20 V 14 H 7 M 3.51,9 A 9,9 0 0 1 18.36,5.64 L 23,10 M 1,14 L 5.64,18.36 A 9,9 0 0 0 20.49,15" Stroke="{StaticResource TextSecondary}" StrokeThickness="1.8" Aspect="Uniform" WidthRequest="16" HeightRequest="16" />
+                            </Border>
+                            <!-- Direct IP Button -->
+                            <Border BackgroundColor="Transparent" Padding="4">
+                                <Border.GestureRecognizers>
                                     <TapGestureRecognizer Tapped="OnDirectIpClicked" />
-                                </Label.GestureRecognizers>
-                            </Label>
+                                </Border.GestureRecognizers>
+                                <Path Data="M 12,2 A 10,10 0 1 0 12,22 A 10,10 0 0 0 12,2 Z M 12,6 A 6,6 0 1 0 12,18 A 6,6 0 0 0 12,6 Z M 12,10 A 2,2 0 1 0 12,14 A 2,2 0 0 0 12,10 Z" Stroke="{StaticResource TextSecondary}" StrokeThickness="1.8" Aspect="Uniform" WidthRequest="16" HeightRequest="16" />
+                            </Border>
                         </HorizontalStackLayout>
                     </Grid>
 
-                    <!-- Nearby Devices Collection (Matching Images 3 & 4 Cards) -->
+                    <!-- Nearby Devices Collection -->
                     <CollectionView x:Name="ColNearbyDevices" SelectionMode="None">
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="models:DeviceInfo">
                                 <Border BackgroundColor="{StaticResource CardBackground}" Stroke="{StaticResource CardBorder}" StrokeThickness="1" StrokeShape="RoundRectangle 14" Padding="14,12" Margin="0,0,0,8">
                                     <Grid ColumnDefinitions="40, *, Auto" ColumnSpacing="10">
-                                        <!-- Device Icon (Laptop or Phone) -->
-                                        <Border Grid.Column="0" WidthRequest="36" HeightRequest="36" BackgroundColor="{StaticResource SurfaceDark}" StrokeShape="RoundRectangle 8">
-                                            <Label Text="{Binding DisplayIcon}" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" />
+                                        <!-- Device Icon (Computer or Phone) -->
+                                        <Border Grid.Column="0" WidthRequest="38" HeightRequest="38" BackgroundColor="{StaticResource SurfaceDark}" StrokeShape="RoundRectangle 8">
+                                            <Path Data="M 20,3 H 4 A 2,2 0 0 0 2,5 V 15 A 2,2 0 0 0 4,17 H 20 A 2,2 0 0 0 22,15 V 5 A 2,2 0 0 0 20,3 Z M 8,21 H 16 M 12,17 V 21" Stroke="{StaticResource Primary}" StrokeThickness="1.8" Aspect="Uniform" WidthRequest="18" HeightRequest="18" HorizontalOptions="Center" VerticalOptions="Center" />
                                         </Border>
 
                                         <!-- Name & Badges -->
@@ -161,7 +181,7 @@
                                             <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="14" TextColor="{StaticResource TextPrimary}" />
                                             <HorizontalStackLayout Spacing="6">
                                                 <Border BackgroundColor="{StaticResource SurfaceDark}" StrokeShape="RoundRectangle 4" Padding="6,1">
-                                                    <Label Text="{Binding Port, StringFormat='#{0}'}" FontSize="10" TextColor="{StaticResource TextSecondary}" />
+                                                    <Label Text="{Binding IpAddress}" FontSize="10" TextColor="{StaticResource TextSecondary}" />
                                                 </Border>
                                                 <Border BackgroundColor="{StaticResource SurfaceDark}" StrokeShape="RoundRectangle 4" Padding="6,1">
                                                     <Label Text="{Binding DeviceType}" FontSize="10" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
@@ -169,34 +189,21 @@
                                             </HorizontalStackLayout>
                                         </VerticalStackLayout>
 
-                                        <!-- Send Button & Heart -->
-                                        <HorizontalStackLayout Grid.Column="2" Spacing="6" VerticalOptions="Center">
-                                            <Button Text="Senden" FontSize="12" FontAttributes="Bold" BackgroundColor="{StaticResource Primary}" TextColor="#091412" CornerRadius="16" Padding="14,6" Clicked="OnSendToDeviceClicked" CommandParameter="{Binding}" />
-                                            <Label Text="🤍" FontSize="16" VerticalOptions="Center" />
-                                        </HorizontalStackLayout>
+                                        <!-- Send Button -->
+                                        <Button Grid.Column="2" Text="Senden" FontSize="12" FontAttributes="Bold" BackgroundColor="{StaticResource Primary}" TextColor="#080C14" CornerRadius="14" Padding="14,6" Clicked="OnSendToDeviceClicked" CommandParameter="{Binding}" VerticalOptions="Center" />
                                     </Grid>
                                 </Border>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>
 
-                    <!-- Empty State Radar Hint -->
+                    <!-- Empty State Hint -->
                     <Label x:Name="LblNoDevices" Text="Suche nach Geräten im selben WLAN..." FontSize="12" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" Margin="0,14" />
 
-                    <!-- Send Anywhere PIN Generator Button -->
-                    <Border BackgroundColor="{StaticResource SurfaceDark}" Stroke="{StaticResource CardBorder}" StrokeThickness="1" StrokeShape="RoundRectangle 12" Padding="14">
-                        <VerticalStackLayout Spacing="6">
-                            <Label Text="🔑 Send Anywhere 6-Stelliger PIN" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" />
-                            <Label Text="Erstelle einen Code, den jeder Empfänger im Netzwerk eingeben kann:" FontSize="11" TextColor="{StaticResource TextSecondary}" />
-                            <Button Text="PIN generieren" BackgroundColor="{StaticResource Secondary}" TextColor="{StaticResource Primary}" FontAttributes="Bold" CornerRadius="8" Clicked="OnGeneratePinClicked" />
-                        </VerticalStackLayout>
-                    </Border>
-
-                    <!-- Troubleshoot Hint (Matching Image 3) -->
+                    <!-- Troubleshoot Hint -->
                     <VerticalStackLayout Spacing="2" HorizontalOptions="Center" Margin="0,8,0,0">
                         <Label Text="Troubleshoot" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource Primary}" HorizontalOptions="Center" />
-                        <Label Text="Please ensure that the desired target is also in the same wifi network." FontSize="11" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" HorizontalTextAlignment="Center" />
-                        <Label Text="You can also use the 'Share' feature of your mobile device to select files more easily." FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" HorizontalTextAlignment="Center" Margin="0,4,0,0" />
+                        <Label Text="Bitte stelle sicher, dass beide Geräte im selben WLAN sind." FontSize="11" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" HorizontalTextAlignment="Center" />
                     </VerticalStackLayout>
                 </VerticalStackLayout>
             </ScrollView>
@@ -204,15 +211,39 @@
             <!-- ==================== VIEW 3: SETTINGS ==================== -->
             <ScrollView x:Name="ViewSettings" IsVisible="False" Padding="16">
                 <VerticalStackLayout Spacing="16">
-                    <Label Text="Einstellungen" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" />
+                    <Label Text="Einstellungen" FontSize="20" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" />
 
                     <!-- Device Name -->
                     <Border BackgroundColor="{StaticResource CardBackground}" Stroke="{StaticResource CardBorder}" StrokeThickness="1" StrokeShape="RoundRectangle 12" Padding="14">
                         <VerticalStackLayout Spacing="8">
-                            <Label Text="Gerätename (Alias)" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" />
+                            <Label Text="Gerätename (Alias im Netzwerk)" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" />
                             <Grid ColumnDefinitions="*, Auto" ColumnSpacing="8">
                                 <Entry x:Name="EntryDeviceName" Text="Android Phone" BackgroundColor="{StaticResource SurfaceDark}" TextColor="{StaticResource TextPrimary}" />
-                                <Button Grid.Column="1" Text="Speichern" BackgroundColor="{StaticResource Primary}" TextColor="#091412" FontAttributes="Bold" Clicked="OnSaveDeviceNameClicked" />
+                                <Button Grid.Column="1" Text="Speichern" BackgroundColor="{StaticResource Primary}" TextColor="#080C14" FontAttributes="Bold" Clicked="OnSaveDeviceNameClicked" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Security & PIN Protection -->
+                    <Border BackgroundColor="{StaticResource CardBackground}" Stroke="{StaticResource CardBorder}" StrokeThickness="1" StrokeShape="RoundRectangle 12" Padding="14">
+                        <VerticalStackLayout Spacing="10">
+                            <HorizontalStackLayout Spacing="8">
+                                <Path Data="M 12,22 S 20,18 20,12 V 5 L 12,2 L 4,5 V 12 S 4,18 12,22 Z M 12,8 A 2,2 0 1 0 12,12 A 2,2 0 0 0 12,8 Z M 12,12 V 16" Stroke="{StaticResource Primary}" StrokeThickness="1.8" Aspect="Uniform" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
+                                <Label Text="Sicherheit &amp; PIN-Schutz" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                            
+                            <Grid ColumnDefinitions="*, Auto">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="PIN für Übertragungen erzwingen" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" />
+                                    <Label Text="Andere Geräte müssen deinen PIN eingeben" FontSize="10" TextColor="{StaticResource TextSecondary}" />
+                                </VerticalStackLayout>
+                                <Switch Grid.Column="1" x:Name="SwitchPinProtection" Toggled="OnPinProtectionToggled" />
+                            </Grid>
+
+                            <Label Text="Dein 6-stelliger Sicherheits-PIN:" FontSize="11" TextColor="{StaticResource TextSecondary}" />
+                            <Grid ColumnDefinitions="*, Auto" ColumnSpacing="8">
+                                <Entry x:Name="EntryPinConfig" Text="123456" FontSize="16" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="{StaticResource Primary}" BackgroundColor="{StaticResource SurfaceDark}" Keyboard="Numeric" MaxLength="6" TextChanged="OnPinConfigChanged" />
+                                <Button Grid.Column="1" Text="Neu" BackgroundColor="{StaticResource Secondary}" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold" Clicked="OnGenerateNewPinClicked" />
                             </Grid>
                         </VerticalStackLayout>
                     </Border>
@@ -222,7 +253,7 @@
                         <Grid ColumnDefinitions="*, Auto">
                             <VerticalStackLayout Spacing="2">
                                 <Label Text="Quick Save (Auto-Akzeptieren)" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" />
-                                <Label Text="Dateien automatisch empfangen ohne Nachfrage" FontSize="11" TextColor="{StaticResource TextSecondary}" />
+                                <Label Text="Dateien automatisch ohne Bestätigung empfangen" FontSize="11" TextColor="{StaticResource TextSecondary}" />
                             </VerticalStackLayout>
                             <Switch Grid.Column="1" x:Name="SwitchAutoAccept" Toggled="OnAutoAcceptToggled" />
                         </Grid>
@@ -231,9 +262,9 @@
                     <!-- Network Info -->
                     <Border BackgroundColor="{StaticResource SurfaceDark}" Stroke="{StaticResource CardBorder}" StrokeThickness="1" StrokeShape="RoundRectangle 12" Padding="14">
                         <VerticalStackLayout Spacing="4">
-                            <Label Text="AuraDrop • LocalSend &amp; Send Anywhere" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" />
+                            <Label Text="AuraDrop P2P Transfer" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" />
                             <Label x:Name="LblNetDetails" Text="IP: 192.168.0.x | Port: 52525" FontSize="11" TextColor="{StaticResource TextMuted}" />
-                            <Label Text="Direktes P2P ohne Cloud-Server." FontSize="10" TextColor="{StaticResource Primary}" />
+                            <Label Text="Direktes P2P ohne Cloud-Server. 100% Originalqualität." FontSize="10" TextColor="{StaticResource Primary}" />
                         </VerticalStackLayout>
                     </Border>
                 </VerticalStackLayout>
@@ -243,19 +274,19 @@
             <Border x:Name="ModalPinDisplay" BackgroundColor="#E6000000" IsVisible="False" Padding="20">
                 <Border BackgroundColor="{StaticResource CardBackground}" Stroke="{StaticResource CardBorder}" StrokeThickness="1" StrokeShape="RoundRectangle 18" Padding="24" VerticalOptions="Center">
                     <VerticalStackLayout Spacing="14" HorizontalOptions="Center">
-                        <Label Text="🔑 Send Anywhere PIN" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" HorizontalOptions="Center" />
-                        <Label Text="Gib diesen 6-stelligen Code auf dem Zielgerät ein:" FontSize="12" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" HorizontalTextAlignment="Center" />
-                        <Border BackgroundColor="{StaticResource SurfaceDark}" Stroke="{StaticResource Primary}" StrokeThickness="2" StrokeShape="RoundRectangle 12" Padding="20,12">
+                        <Label Text="6-stelliger Transfer-PIN" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" HorizontalOptions="Center" />
+                        <Label Text="Gib diesen PIN auf dem Zielgerät ein:" FontSize="12" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" HorizontalTextAlignment="Center" />
+                        <Border BackgroundColor="{StaticResource SurfaceDark}" Stroke="{StaticResource Primary}" StrokeThickness="2" StrokeShape="RoundRectangle 12" Padding="24,12">
                             <Label x:Name="LblGeneratedPin" Text="000 000" FontSize="34" FontAttributes="Bold" TextColor="{StaticResource Primary}" HorizontalOptions="Center" />
                         </Border>
-                        <Label Text="Warte auf Download..." FontSize="11" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" />
-                        <Button Text="Schließen" BackgroundColor="{StaticResource SurfaceLightDark}" TextColor="{StaticResource TextPrimary}" CornerRadius="8" Clicked="OnClosePinModalClicked" />
+                        <Label Text="Warte auf Download durch Empfänger..." FontSize="11" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" />
+                        <Button Text="Schließen" BackgroundColor="{StaticResource Primary}" TextColor="#080C14" FontAttributes="Bold" CornerRadius="8" Clicked="OnClosePinModalClicked" />
                     </VerticalStackLayout>
                 </Border>
             </Border>
 
             <!-- Live Transfer Progress Modal Overlay -->
-            <Border x:Name="ModalProgress" BackgroundColor="#EE101A18" IsVisible="False" Padding="20">
+            <Border x:Name="ModalProgress" BackgroundColor="#EE080C14" IsVisible="False" Padding="20">
                 <Border BackgroundColor="{StaticResource CardBackground}" Stroke="{StaticResource CardBorder}" StrokeThickness="1" StrokeShape="RoundRectangle 18" Padding="24" VerticalOptions="Center">
                     <VerticalStackLayout Spacing="12">
                         <Label x:Name="LblProgressTitle" Text="Dateien werden übertragen..." FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" />
@@ -266,45 +297,45 @@
                             <Label Grid.Column="1" x:Name="LblProgressSpeed" Text="0 MB/s" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource Primary}" HorizontalOptions="Center" />
                             <Label Grid.Column="2" x:Name="LblProgressEta" Text="--:--" FontSize="12" TextColor="{StaticResource TextMuted}" HorizontalOptions="End" />
                         </Grid>
-                        <Button Text="Abbrechen" BackgroundColor="{StaticResource Danger}" TextColor="White" CornerRadius="8" Margin="0,10,0,0" Clicked="OnCancelTransferClicked" />
+                        <Button Text="Übertragung abbrechen" BackgroundColor="{StaticResource Danger}" TextColor="White" CornerRadius="8" Margin="0,10,0,0" Clicked="OnCancelTransferClicked" />
                     </VerticalStackLayout>
                 </Border>
             </Border>
         </Grid>
 
-        <!-- Bottom Navigation Bar (Matching Images 2, 3, 4: Receive, Send, Settings) -->
+        <!-- Bottom Navigation Bar -->
         <Border Grid.Row="2" BackgroundColor="{StaticResource SurfaceDark}" Stroke="{StaticResource CardBorder}" StrokeThickness="0,1,0,0" Padding="12,8">
             <Grid ColumnDefinitions="*, *, *">
                 <!-- Receive Pill -->
-                <Border Grid.Column="0" x:Name="BorderNavReceive" BackgroundColor="{StaticResource Secondary}" StrokeShape="RoundRectangle 18" Padding="14,6" HorizontalOptions="Center">
+                <Border Grid.Column="0" x:Name="BorderNavReceive" BackgroundColor="{StaticResource Secondary}" StrokeShape="RoundRectangle 16" Padding="14,6" HorizontalOptions="Center">
                     <Border.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnNavReceiveClicked" />
                     </Border.GestureRecognizers>
                     <VerticalStackLayout Spacing="2" HorizontalOptions="Center">
-                        <Label Text="📶" FontSize="16" HorizontalOptions="Center" />
-                        <Label x:Name="LblNavReceive" Text="Receive" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource Primary}" HorizontalOptions="Center" />
+                        <Path Data="M 21,15 V 19 A 2,2 0 0 1 19,21 H 5 A 2,2 0 0 1 3,19 V 15 M 7,10 L 12,15 L 17,10 M 12,15 V 3" Stroke="{StaticResource Primary}" StrokeThickness="1.8" Aspect="Uniform" WidthRequest="16" HeightRequest="16" HorizontalOptions="Center" />
+                        <Label x:Name="LblNavReceive" Text="Empfangen" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource Primary}" HorizontalOptions="Center" />
                     </VerticalStackLayout>
                 </Border>
 
                 <!-- Send Pill -->
-                <Border Grid.Column="1" x:Name="BorderNavSend" BackgroundColor="Transparent" StrokeShape="RoundRectangle 18" Padding="14,6" HorizontalOptions="Center">
+                <Border Grid.Column="1" x:Name="BorderNavSend" BackgroundColor="Transparent" StrokeShape="RoundRectangle 16" Padding="14,6" HorizontalOptions="Center">
                     <Border.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnNavSendClicked" />
                     </Border.GestureRecognizers>
                     <VerticalStackLayout Spacing="2" HorizontalOptions="Center">
-                        <Label Text="✈️" FontSize="16" HorizontalOptions="Center" />
-                        <Label x:Name="LblNavSend" Text="Send" FontSize="11" FontAttributes="None" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" />
+                        <Path Data="M 22,2 L 11,13 M 22,2 L 15,22 L 11,13 L 2,9 Z" Stroke="{StaticResource TextSecondary}" StrokeThickness="1.8" Aspect="Uniform" WidthRequest="16" HeightRequest="16" HorizontalOptions="Center" />
+                        <Label x:Name="LblNavSend" Text="Senden" FontSize="11" FontAttributes="None" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" />
                     </VerticalStackLayout>
                 </Border>
 
                 <!-- Settings Pill -->
-                <Border Grid.Column="2" x:Name="BorderNavSettings" BackgroundColor="Transparent" StrokeShape="RoundRectangle 18" Padding="14,6" HorizontalOptions="Center">
+                <Border Grid.Column="2" x:Name="BorderNavSettings" BackgroundColor="Transparent" StrokeShape="RoundRectangle 16" Padding="14,6" HorizontalOptions="Center">
                     <Border.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnNavSettingsClicked" />
                     </Border.GestureRecognizers>
                     <VerticalStackLayout Spacing="2" HorizontalOptions="Center">
-                        <Label Text="⚙️" FontSize="16" HorizontalOptions="Center" />
-                        <Label x:Name="LblNavSettings" Text="Settings" FontSize="11" FontAttributes="None" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" />
+                        <Path Data="M 12,15 A 3,3 0 1 0 12,9 A 3,3 0 0 0 12,15 Z M 19.4,15 A 1.65,1.65 0 0 0 19.73,16.82 L 19.79,16.88 A 2,2 0 0 1 16.96,19.71 L 16.9,19.65 A 1.65,1.65 0 0 0 15.08,19.32 A 1.65,1.65 0 0 0 14,20.83 V 21 A 2,2 0 0 1 10,21 V 20.91 A 1.65,1.65 0 0 0 9,19.4 A 1.65,1.65 0 0 0 7.18,19.73 L 7.12,19.79 A 2,2 0 0 1 4.29,16.96 L 4.35,16.9 A 1.65,1.65 0 0 0 4.68,15.08 A 1.65,1.65 0 0 0 3.17,14 H 3 A 2,2 0 0 1 3,10 H 3.09 A 1.65,1.65 0 0 0 4.6,9 A 1.65,1.65 0 0 0 4.27,7.18 L 4.21,7.12 A 2,2 0 0 1 7.04,4.29 L 7.1,4.35 A 1.65,1.65 0 0 0 8.92,4.68 A 1.65,1.65 0 0 0 10,3.17 V 3 A 2,2 0 0 1 14,3 V 3.09 A 1.65,1.65 0 0 0 15,4.6 A 1.65,1.65 0 0 0 16.82,4.27 L 16.88,4.21 A 2,2 0 0 1 19.71,7.04 L 19.65,7.1 A 1.65,1.65 0 0 0 19.32,8.92 A 1.65,1.65 0 0 0 20.83,10 H 21 A 2,2 0 0 1 21,14 H 20.91 A 1.65,1.65 0 0 0 19.4,15 Z" Stroke="{StaticResource TextSecondary}" StrokeThickness="1.8" Aspect="Uniform" WidthRequest="16" HeightRequest="16" HorizontalOptions="Center" />
+                        <Label x:Name="LblNavSettings" Text="Einstellungen" FontSize="11" FontAttributes="None" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" />
                     </VerticalStackLayout>
                 </Border>
             </Grid>
